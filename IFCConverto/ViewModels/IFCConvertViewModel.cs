@@ -1,4 +1,5 @@
 ﻿using IFCConverto.MVVM;
+using IFCConverto.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace IFCConverto.ViewModels
         private ICommand sourceLocationAccessCommand;
         private ICommand destinationLocationAccessCommand;
         private ICommand convertCommand;
+        private IOService ioService;
 
         #endregion
 
@@ -102,6 +104,8 @@ namespace IFCConverto.ViewModels
             SourceLocationAccessCommand = new DelegateCommand(AccessSourceLocation, () => true);
             DestinationLocationAccessCommand = new DelegateCommand(AccessDestinationLocation, () => true);
             ConvertCommand = new DelegateCommand(ConvertFiles, () => true);
+
+            ioService = new IOService();
         }
 
         private void ConvertFiles()
@@ -110,13 +114,13 @@ namespace IFCConverto.ViewModels
         }
 
         private void AccessDestinationLocation()
-        {
-            DestinationPath = string.Empty;
+        {            
+            DestinationPath =  ioService.OpenFolderPicker("Select destination folder", DestinationPath);
         }
 
         private void AccessSourceLocation()
-        {
-            SourcePath = string.Empty;
+        {            
+            SourcePath = ioService.OpenFolderPicker("Select source folder", SourcePath);
         }
     }
 }

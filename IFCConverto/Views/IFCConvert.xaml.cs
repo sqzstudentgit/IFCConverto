@@ -21,12 +21,13 @@ namespace IFCConverto.Views
     /// </summary>
     public partial class IFCConvert : Page
     {
-        public IFCConvertViewModel IFCConvertViewModel { get; set; }
+        public IFCConvertViewModel ViewModel { get; set; }
 
         public IFCConvert()
         {
             InitializeComponent();
-            DataContext = IFCConvertViewModel;
+            ViewModel = new IFCConvertViewModel();
+            DataContext = ViewModel;
         }
     }
 }

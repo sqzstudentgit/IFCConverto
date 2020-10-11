@@ -24,20 +24,7 @@ namespace IFCConverto.MVVM
             this.execute = execute;
             this.canExecute = canExecute;
         }
-
-        event EventHandler ICommand.CanExecuteChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
+      
         public event EventHandler CanExecuteChanged;
 
         [SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "This cannot be an event")]
