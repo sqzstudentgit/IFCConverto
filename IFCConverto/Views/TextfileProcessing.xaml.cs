@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IFCConverto.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,12 @@ namespace IFCConverto.Views
     /// </summary>
     public partial class TextfileProcessing : Page
     {
+        public TextfileProcessingViewModel TextfileProcessingViewModel { get; set; }
+
         public TextfileProcessing()
         {
             InitializeComponent();
+            DataContext = TextfileProcessingViewModel;
         }
     }
 }

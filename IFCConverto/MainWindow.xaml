@@ -48,11 +48,6 @@
                                 ItemClick="OnMenuItemClick" ItemsSource="{Binding Menu}" ItemTemplate="{StaticResource MenuItemTemplate}"
                                 DisplayMode="CompactInline">
 
-            <!--<controls:HamburgerMenu.Resources>
-                <SolidColorBrush x:Key="MahApps.Brushes.Accent3" Color="#FF71B004"/>
-                <SolidColorBrush x:Key="MahApps.Brushes.Accent" Color="#FF28930D"/>
-            </controls:HamburgerMenu.Resources>-->
-
         </controls:HamburgerMenu>
     </Grid>
     

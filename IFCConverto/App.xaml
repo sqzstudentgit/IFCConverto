@@ -16,6 +16,7 @@
                 <ResourceDictionary Source="Themes/Textbox.xaml" />
                 <ResourceDictionary Source="Themes/Textblock.xaml" />
                 <ResourceDictionary Source="Themes/Button.xaml" />
+                <ResourceDictionary Source="Themes/Grid.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

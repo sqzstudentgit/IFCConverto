@@ -8,7 +8,38 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="TextfileProcessing">
 
-    <Grid>
-        <TextBlock Text="Update to show Text file processing controls" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Grid Style="{StaticResource PageParentGridStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Process Textfile(s)" Style="{StaticResource PageTitleTextBlockStyle}" VerticalAlignment="Center"/>
+
+        <!-- Source File Picker Stack Panel-->
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left">
+            <TextBlock Text="Source Location Path" Style="{StaticResource InputTextboxLabels}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBox Style="{StaticResource FilePathTextboxStyle}" />
+                <Button Content="Source" Style="{StaticResource FolderPickerButtonStyle}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Destination File Picker Stack Panel -->
+        <StackPanel Grid.Row="2" HorizontalAlignment="Left">
+            <TextBlock Text="Destination Location Path" Style="{StaticResource InputTextboxLabels}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBox Style="{StaticResource FilePathTextboxStyle}" />
+                <Button Content="Destination" Style="{StaticResource FolderPickerButtonStyle}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Convert Button to initiate conversion -->
+        <Button Grid.Row="3" Content="Process" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
     </Grid>
 </Page>
