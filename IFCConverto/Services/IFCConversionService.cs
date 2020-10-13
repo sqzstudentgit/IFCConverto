@@ -33,32 +33,35 @@ namespace IFCConverto.Services
                     // get all file names from the source location
                     var allFilenames = Directory.EnumerateFiles(sourceLocation).Select(p => Path.GetFileName(p));
 
-                    //// Get all filenames that have a .txt extension, excluding the extension
+                    // Get all filenames that have a .ifc extension
                     var files = allFilenames.Where(fn => Path.GetExtension(fn) == ".ifc");
 
+                    // If there are no files, then return to notify the user
                     if (files == null || files.Count() == 0)
                     {
                         return IFCConvertStatus.NoFiles;
                     }
 
+                    // Get total number of files, (need it for the progress bar)
                     var totalFiles = files.Count();
 
                     // Send the total count of the files to the viewmodel for update on UI
                     TotalFiles?.Invoke(totalFiles.ToString());
                     
+                    // Process each file and convert it 
                     foreach (var file in files)
-                    {
-                        // Source FileName: D:\Study\Uni Melb\Semester 7\Software Project\Research\IFC files\Holyoake diffusers_600_12_with Plenum.ifc
-                        // Destination FileName: D:\Study\Uni Melb\Semester 7\Software Project\Research\IFC files\22.glb
+                    {                        
                         var sourceFile = Path.Combine(sourceLocation, file);
                         var filePathWithGLTFExtentsion = Path.ChangeExtension(file, ".glb");
                         var destinationFile = Path.Combine(destinationLocation, filePathWithGLTFExtentsion);
                         IFCConvert.Convert(sourceFile, destinationFile);
-
                         totalFiles--;
+
+                        // Send message to UI to update progress bar
                         RemainingFiles?.Invoke((totalFiles).ToString());
                     }
 
+                    // Return success message
                     return IFCConvertStatus.Done;
                 });                
             }
