@@ -144,7 +144,7 @@ namespace IFCConverto.ViewModels
             ioService = new IOService();
             iFCConversionService = new IFCConversionService();
             IDialogCoordinator = iDialogCoordinator;
-            IsConvertButtonEnabled = true;
+            //IsConvertButtonEnabled = true;
 
             // Subscribe to event handlers in the service layer
             iFCConversionService.ConversionException += IFCConversionException;
@@ -179,20 +179,20 @@ namespace IFCConverto.ViewModels
             if (!string.IsNullOrEmpty(SourcePath) && !string.IsNullOrEmpty(DestinationPath))
             {
                 // Disable the convert button while processing 
-                IsConvertButtonEnabled = false;
+                //IsConvertButtonEnabled = false;
 
                 var status = await iFCConversionService.ConvertFiles(SourcePath, DestinationPath);
 
                 if (status == IFCConvertStatus.NoFiles)
                 {
                     _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The source folder does not contain IFC files. Please reselect and try again");
-                    IsConvertButtonEnabled = true;
+                   // IsConvertButtonEnabled = true;
                     return;
                 }
                 else if (status == IFCConvertStatus.Done)
                 {
                     _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the IFC files have been converted successfully");
-                    IsConvertButtonEnabled = true;
+                    //IsConvertButtonEnabled = true;
                     return;
                 }
             }

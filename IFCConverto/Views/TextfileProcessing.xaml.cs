@@ -1,4 +1,5 @@
 ﻿using IFCConverto.ViewModels;
+using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace IFCConverto.Views
         public TextfileProcessing()
         {
             InitializeComponent();
+            TextfileProcessingViewModel = new TextfileProcessingViewModel(DialogCoordinator.Instance);
             DataContext = TextfileProcessingViewModel;
         }
     }

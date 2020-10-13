@@ -149,10 +149,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Enums\IFCConvertEnum.cs" />
+    <Compile Include="Enums\TextfileProcessingEnum.cs" />
     <Compile Include="Services\IFCConversionService.cs" />
     <Compile Include="Services\IOService.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="MVVM\DelegateCommand.cs" />
+    <Compile Include="Services\TextfileProcessingService.cs" />
     <Compile Include="ViewModels\IFCConvertViewModel.cs" />
     <Compile Include="ViewModels\MenuItemViewModel.cs" />
     <Compile Include="ViewModels\MenuItemViewModelBase.cs" />

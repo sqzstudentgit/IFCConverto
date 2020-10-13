@@ -42,8 +42,8 @@
         </StackPanel>
         
         <!-- Convert Button to initiate conversion -->
-        <Button Grid.Row="3" Content="Convert" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=ConvertCommand}"
-                IsEnabled="{Binding Path=IsConvertButtonEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Grid.Row="3" Content="Convert" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=ConvertCommand}"/>
+                <!--IsEnabled="{Binding Path=IsConvertButtonEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"-->
 
         <StackPanel Grid.Row="4" Margin="{StaticResource ProgressBarMarginTop}" HorizontalAlignment="Left">
             <TextBlock Text="Progress" Style="{StaticResource InputTextboxLabels}"/>
