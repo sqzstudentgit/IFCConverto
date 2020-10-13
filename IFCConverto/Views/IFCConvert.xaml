@@ -1,9 +1,11 @@
 ﻿<Page x:Class="IFCConverto.Views.IFCConvert"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:IFCConverto.Views"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+      Dialog:DialogParticipation.Register="{Binding}"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="IFCConvert">
@@ -41,5 +43,11 @@
         
         <!-- Convert Button to initiate conversion -->
         <Button Grid.Row="3" Content="Convert" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=ConvertCommand}"/>
+
+        <StackPanel Grid.Row="4" Margin="{StaticResource ProgressBarMarginTop}" HorizontalAlignment="Left">
+            <TextBlock Text="Progress" Style="{StaticResource InputTextboxLabels}"/>
+            <controls:MetroProgressBar Maximum="100" Minimum="0"
+                                       Value="{Binding Path=RemainingFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="710"/>
+        </StackPanel>
     </Grid>
 </Page>
