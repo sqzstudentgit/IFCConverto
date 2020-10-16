@@ -25,8 +25,8 @@
             <TextBlock Text="Source Location Path" Style="{StaticResource InputTextboxLabels}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <TextBox Style="{StaticResource FilePathTextboxStyle}" />
-                <Button Content="Source" Style="{StaticResource FolderPickerButtonStyle}"/>
+                <TextBox Style="{StaticResource FilePathTextboxStyle}"  Text="{Binding Path=SourcePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Content="Source" Style="{StaticResource FolderPickerButtonStyle}" Command="{Binding Path=SourceLocationAccessCommand}"/>
             </StackPanel>
         </StackPanel>
 
@@ -35,12 +35,12 @@
             <TextBlock Text="Destination Location Path" Style="{StaticResource InputTextboxLabels}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <TextBox Style="{StaticResource FilePathTextboxStyle}" />
-                <Button Content="Destination" Style="{StaticResource FolderPickerButtonStyle}"/>
+                <TextBox Style="{StaticResource FilePathTextboxStyle}" Text="{Binding Path=DestinationPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Content="Destination" Style="{StaticResource FolderPickerButtonStyle}" Command="{Binding Path=DestinationLocationAccessCommand}"/>
             </StackPanel>
         </StackPanel>
 
         <!-- Convert Button to initiate conversion -->
-        <Button Grid.Row="3" Content="Process" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Button Grid.Row="3" Content="Process" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=ProcessCommand}"/>
     </Grid>
 </Page>

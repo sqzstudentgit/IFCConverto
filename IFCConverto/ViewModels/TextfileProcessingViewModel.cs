@@ -22,7 +22,7 @@ namespace IFCConverto.ViewModels
 
         private ICommand sourceLocationAccessCommand;
         private ICommand destinationLocationAccessCommand;
-        private ICommand convertCommand;
+        private ICommand processCommand;
         private IOService ioService;
         private TextfileProcessingService textfileProcessingService;
 
@@ -103,16 +103,16 @@ namespace IFCConverto.ViewModels
             }
         }
 
-        public ICommand ConvertCommand
+        public ICommand ProcessCommand
         {
             get
             {
-                return convertCommand;
+                return processCommand;
             }
 
             set
             {
-                convertCommand = (DelegateCommand)value;
+                processCommand = (DelegateCommand)value;
                 OnPropertyChanged("ConvertCommand");
             }
         }
@@ -138,7 +138,7 @@ namespace IFCConverto.ViewModels
         {
             SourceLocationAccessCommand = new DelegateCommand(AccessSourceLocation, () => true);
             DestinationLocationAccessCommand = new DelegateCommand(AccessDestinationLocation, () => true);
-            ConvertCommand = new DelegateCommand(ProcessFiles, () => true);
+            ProcessCommand = new DelegateCommand(ProcessFiles, () => true);
             ioService = new IOService();
             IDialogCoordinator = iDialogCoordinator;
             textfileProcessingService = new TextfileProcessingService();
@@ -181,13 +181,13 @@ namespace IFCConverto.ViewModels
 
                 if (status == TextfileProcessingStatus.NoFiles)
                 {
-                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The source folder does not contain IFC files. Please reselect and try again");
+                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The source folder does not contain text files. Please reselect and try again");
                     // IsConvertButtonEnabled = true;
                     return;
                 }
                 else if (status == TextfileProcessingStatus.Done)
                 {
-                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the IFC files have been converted successfully");
+                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the text files have been processed successfully");
                     //IsConvertButtonEnabled = true;
                     return;
                 }

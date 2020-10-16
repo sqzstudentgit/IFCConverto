@@ -19,13 +19,13 @@ namespace IFCConverto.Services
         /// <returns>Source or Destination path string, which will be consumed elsewhere</returns>
         public string OpenFolderPicker(string title, string currentPath)
         {
-            var sourcePath = string.Empty;
-
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = true;
-            dialog.EnsureReadOnly = true;
-            dialog.Multiselect = false;           
-            dialog.Title = title;
+            var dialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true,
+                EnsureReadOnly = true,
+                Multiselect = false,
+                Title = title
+            };
 
             if (string.IsNullOrEmpty(currentPath))
             {
@@ -38,10 +38,12 @@ namespace IFCConverto.Services
 
             CommonFileDialogResult result = dialog.ShowDialog();
 
-            if(result == CommonFileDialogResult.Ok)
+            string sourcePath;
+
+            if (result == CommonFileDialogResult.Ok)
             {
                 sourcePath = dialog.FileName;
-            }     
+            }
             else
             {
                 sourcePath = currentPath;
