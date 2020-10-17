@@ -152,12 +152,17 @@
     <Compile Include="Enums\IFCConvertEnum.cs" />
     <Compile Include="Enums\TextfileProcessingEnum.cs" />
     <Compile Include="Helpers\EncryptionHelper.cs" />
+    <Compile Include="Helpers\SettingsHelper.cs" />
+    <Compile Include="Models\AppSettings.cs" />
+    <Compile Include="Models\ProductParameters.cs" />
+    <Compile Include="Models\Products.cs" />
     <Compile Include="Services\IFCConversionService.cs" />
     <Compile Include="Services\IOService.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="MVVM\SimpleDelegateCommand.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\TextfileProcessingService.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="ViewModels\IFCConvertViewModel.cs" />
     <Compile Include="ViewModels\MenuItemViewModel.cs" />
     <Compile Include="ViewModels\MenuItemViewModelBase.cs" />
@@ -240,15 +245,13 @@
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

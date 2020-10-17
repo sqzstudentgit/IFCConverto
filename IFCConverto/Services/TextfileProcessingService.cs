@@ -1,5 +1,7 @@
-﻿using Microsoft.VisualBasic;
+﻿using IFCConverto.Models;
+using Microsoft.VisualBasic;
 using Microsoft.WindowsAPICodePack.Net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,6 +19,7 @@ namespace IFCConverto.Services
         public event TextfileProcessingUpdateForUIEventHandler TotalFiles;
         public event TextfileProcessingUpdateForUIEventHandler RemainingFiles;
         public event TextfileProcessingUpdateForUIEventHandler ProcessingException;
+        public event TextfileProcessingUpdateForUIEventHandler ColumnMismatch;
 
         /// <summary>
         /// Method to process the text file and generate JSON files
@@ -48,6 +51,9 @@ namespace IFCConverto.Services
                     // Send the total count of the files to the viewmodel for update on UI
                     TotalFiles?.Invoke(totalFiles.ToString());
 
+                    // List for all the products with their key value pairs of data. This list will be serialzied and sent to the API
+                    var productList = new List<Products>();
+
                     // Process each file and convert it 
                     foreach (var file in files)
                     {
@@ -68,11 +74,29 @@ namespace IFCConverto.Services
                         // However, if this condition is not satisfied, that means there is something wrong with the file. We need to alert the user.
                         if (content != null && finalHeadings != null && content.Count() > 0 && finalHeadings.Count > 0 && finalHeadings.Count == content.Count)
                         {
-                            
+                            var products = new Products
+                            {
+                                ProductParameters = new List<ProductParameters>(),
+                                Code = Path.GetFileNameWithoutExtension(file)
+                            };
+
+                            // Now make the key value pairs of the tokenized strings
+                            for (var i = 0; i < finalHeadings.Count; i++)
+                            {
+                                var productParam = new ProductParameters
+                                {
+                                    Key = finalHeadings[i],
+                                    Value = content[i]
+                                };
+
+                                products.ProductParameters.Add(productParam);
+                            }
+
+                            productList.Add(products);                            
                         }                        
                         else
                         {
-
+                            ColumnMismatch?.Invoke("A mismatch between heading and content columns occured in file: " + Path.GetFileNameWithoutExtension(file));
                         }
                         
                         totalFiles--;
@@ -80,6 +104,10 @@ namespace IFCConverto.Services
                         // Send message to UI to update progress bar
                         RemainingFiles?.Invoke((totalFiles).ToString());
                     }
+                    
+                    SendDataToAPI(productList);
+                    
+                    StoreDataLocally(productList, destinationLocation);                   
 
                     // Return success message
                     return TextfileProcessingStatus.Done;
@@ -92,6 +120,38 @@ namespace IFCConverto.Services
             }
         }
 
+        /// <summary>
+        /// This method will store the data locally in the JSON file at the destination location
+        /// </summary>
+        /// <param name="productList">List of products</param>
+        /// <param name="destinationLocation">Destination location path</param>
+        private void StoreDataLocally(List<Products> productList, string destinationLocation)
+        {
+            // Combine all the processed textfile in 1 Json file and place in the destiantion folder
+            var destinationFile = Path.Combine(destinationLocation, "ParameterizedData.json");
+
+            using (StreamWriter file = File.CreateText(destinationFile))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, productList);
+            }
+        }
+
+        /// <summary>
+        /// This method will post the data to the Server for DB storage
+        /// </summary>
+        /// <param name="productList">List of products</param>
+        private void SendDataToAPI(List<Products> productList)
+        {
+            // create a json string
+            var jsonString = JsonConvert.SerializeObject(productList);
+        }
+
+        /// <summary>
+        /// This method is used to process the content of the csv file (except the hearder line)
+        /// </summary>
+        /// <param name="contentString">content of the csv file</param>
+        /// <returns></returns>
         private List<string> ProcessData(string contentString)
         {
             List<string> content;
