@@ -37,12 +37,25 @@ namespace IFCConverto
                 Services.NavigationService.Navigate(menuItem.NavigationDestination);
             }
         }
-        
+
+        /// <summary>
+        /// Event handler for clicking the options menu item in the hamburger menu
+        /// </summary>        
+        private void OnOptionItemClick(object sender, ItemClickEventArgs e)
+        {
+            var optionMenuItem = e.ClickedItem as MenuItemViewModel;
+
+            if (optionMenuItem != null && optionMenuItem.IsNavigation)
+            {
+                Services.NavigationService.Navigate(optionMenuItem.NavigationDestination);
+            }
+        }
+
         // When the Window loads, always navigate to the first item in the Menu. In this case, it is IFC Convert.
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             Services.NavigationService.Navigate(new Uri("Views/IFCConvert.xaml", UriKind.RelativeOrAbsolute));
             HamburgerMenuControl.SelectedIndex = 0;
-        }
+        }        
     }
 }

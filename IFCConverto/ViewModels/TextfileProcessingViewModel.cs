@@ -84,7 +84,7 @@ namespace IFCConverto.ViewModels
 
             set
             {
-                sourceLocationAccessCommand = (DelegateCommand)value;
+                sourceLocationAccessCommand = (SimpleDelegateCommand)value;
                 OnPropertyChanged("SourceLocationAccessCommand");
             }
         }
@@ -98,7 +98,7 @@ namespace IFCConverto.ViewModels
 
             set
             {
-                destinationLocationAccessCommand = (DelegateCommand)value;
+                destinationLocationAccessCommand = (SimpleDelegateCommand)value;
                 OnPropertyChanged("DestinationLocationAccessCommand");
             }
         }
@@ -112,7 +112,7 @@ namespace IFCConverto.ViewModels
 
             set
             {
-                processCommand = (DelegateCommand)value;
+                processCommand = (SimpleDelegateCommand)value;
                 OnPropertyChanged("ConvertCommand");
             }
         }
@@ -136,9 +136,9 @@ namespace IFCConverto.ViewModels
 
         public TextfileProcessingViewModel(IDialogCoordinator iDialogCoordinator)
         {
-            SourceLocationAccessCommand = new DelegateCommand(AccessSourceLocation, () => true);
-            DestinationLocationAccessCommand = new DelegateCommand(AccessDestinationLocation, () => true);
-            ProcessCommand = new DelegateCommand(ProcessFiles, () => true);
+            SourceLocationAccessCommand = new SimpleDelegateCommand(AccessSourceLocation, () => true);
+            DestinationLocationAccessCommand = new SimpleDelegateCommand(AccessDestinationLocation, () => true);
+            ProcessCommand = new SimpleDelegateCommand(ProcessFiles, () => true);
             ioService = new IOService();
             IDialogCoordinator = iDialogCoordinator;
             textfileProcessingService = new TextfileProcessingService();

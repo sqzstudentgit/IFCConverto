@@ -3,9 +3,11 @@
                     xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:local="clr-namespace:IFCConverto.Themes">
 
+    <!-- Contains styles for all the buttons used in the utility -->
+    
     <Style TargetType="{x:Type Controls:WindowButtonCommands}" BasedOn="{StaticResource MahApps.Styles.WindowButtonCommands.Win10}" />
 
-    <Style x:Key="FolderPickerButtonStyle" TargetType="{x:Type Button}">
+    <Style x:Key="FolderPickerButtonStyle" TargetType="Button">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontWeight" Value="Regular"/>
@@ -13,7 +15,7 @@
         <Setter Property="Width" Value="100"/>
     </Style>
 
-    <Style x:Key="ActionButtonStyle" TargetType="{x:Type Button}">
+    <Style x:Key="ActionButtonStyle" TargetType="Button">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="Height" Value="30"/>

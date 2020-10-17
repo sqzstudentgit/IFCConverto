@@ -12,11 +12,13 @@ namespace IFCConverto.ViewModels
     public class MenuItemViewModelBase : ViewModelBase
     {
         private static readonly ObservableCollection<MenuItemViewModel> ApplicationMenu = new ObservableCollection<MenuItemViewModel>();
+        private static readonly ObservableCollection<MenuItemViewModel> ApplicationOptionsMenu = new ObservableCollection<MenuItemViewModel>();
 
         public MenuItemViewModelBase()
         {
         }
 
         public ObservableCollection<MenuItemViewModel> Menu => ApplicationMenu;
+        public ObservableCollection<MenuItemViewModel> OptionMenu => ApplicationOptionsMenu;
     }
 }

@@ -151,19 +151,26 @@
     </ApplicationDefinition>
     <Compile Include="Enums\IFCConvertEnum.cs" />
     <Compile Include="Enums\TextfileProcessingEnum.cs" />
+    <Compile Include="Helpers\EncryptionHelper.cs" />
     <Compile Include="Services\IFCConversionService.cs" />
     <Compile Include="Services\IOService.cs" />
     <Compile Include="Services\NavigationService.cs" />
-    <Compile Include="MVVM\DelegateCommand.cs" />
+    <Compile Include="MVVM\SimpleDelegateCommand.cs" />
+    <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\TextfileProcessingService.cs" />
     <Compile Include="ViewModels\IFCConvertViewModel.cs" />
     <Compile Include="ViewModels\MenuItemViewModel.cs" />
     <Compile Include="ViewModels\MenuItemViewModelBase.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="MVVM\ParamDelegateCommand.cs" />
     <Compile Include="ViewModels\TextfileProcessingViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Views\IFCConvert.xaml.cs">
       <DependentUpon>IFCConvert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TextfileProcessing.xaml.cs">
       <DependentUpon>TextfileProcessing.xaml</DependentUpon>
@@ -201,6 +208,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\IFCConvert.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Settings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

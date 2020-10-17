@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:IFCConverto.Themes">
 
+    <!-- Contains styles for the progress bar used in the utility -->
+    
     <Thickness x:Key="ProgressBarMarginTop" Left="0" Top="20" Right="0" Bottom="0"/>
        
 </ResourceDictionary>

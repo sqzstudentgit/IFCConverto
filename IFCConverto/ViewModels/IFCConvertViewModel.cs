@@ -86,7 +86,7 @@ namespace IFCConverto.ViewModels
 
             set
             {
-                sourceLocationAccessCommand = (DelegateCommand)value;
+                sourceLocationAccessCommand = (SimpleDelegateCommand)value;
                 OnPropertyChanged("SourceLocationAccessCommand");
             }
         }
@@ -100,7 +100,7 @@ namespace IFCConverto.ViewModels
 
             set
             {
-                destinationLocationAccessCommand = (DelegateCommand)value;
+                destinationLocationAccessCommand = (SimpleDelegateCommand)value;
                 OnPropertyChanged("DestinationLocationAccessCommand");
             }
         }
@@ -114,7 +114,7 @@ namespace IFCConverto.ViewModels
 
             set
             {
-                convertCommand = (DelegateCommand)value;
+                convertCommand = (SimpleDelegateCommand)value;
                 OnPropertyChanged("ConvertCommand");
             }
         }
@@ -138,9 +138,9 @@ namespace IFCConverto.ViewModels
 
         public IFCConvertViewModel(IDialogCoordinator iDialogCoordinator)
         {
-            SourceLocationAccessCommand = new DelegateCommand(AccessSourceLocation, () => true);
-            DestinationLocationAccessCommand = new DelegateCommand(AccessDestinationLocation, () => true);
-            ConvertCommand = new DelegateCommand(ConvertFiles, () => true);
+            SourceLocationAccessCommand = new SimpleDelegateCommand(AccessSourceLocation, () => true);
+            DestinationLocationAccessCommand = new SimpleDelegateCommand(AccessDestinationLocation, () => true);
+            ConvertCommand = new SimpleDelegateCommand(ConvertFiles, () => true);
             ioService = new IOService();
             iFCConversionService = new IFCConversionService();
             IDialogCoordinator = iDialogCoordinator;
