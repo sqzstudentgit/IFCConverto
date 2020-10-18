@@ -1,5 +1,31 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:IFCConverto.Themes">
-    
+
+    <!-- Contains styles for all the textblock / lables used in the utility -->
+
+    <Style x:Key="PageTitleTextBlockStyle" TargetType="TextBlock" >
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontWeight" Value="Light" />
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="LineHeight" Value="1.20"/>
+        <Setter Property="FontStretch" Value="Normal"/>
+        <Setter Property="Margin" Value="0,0,0,30"/>
+    </Style>
+
+    <Style x:Key="InputTextboxLabels" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,15,0,5"/>
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontWeight" Value="Light" />
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="SectionHeader">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Margin" Value="0,15,0,5"/>
+        <Setter Property="Foreground" Value="#FF999999" />
+    </Style>
+
 </ResourceDictionary>

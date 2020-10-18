@@ -1,10 +1,6 @@
 ﻿using IFCConverto.MVVM;
 using MahApps.Metro.IconPacks;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IFCConverto.ViewModels
 {
@@ -21,7 +17,7 @@ namespace IFCConverto.ViewModels
                 Icon = new PackIconMaterial { Kind = PackIconMaterialKind.CogClockwise },
                 Text = "IFC Convert",
                 NavigationDestination = new Uri("Views/IFCConvert.xaml", UriKind.RelativeOrAbsolute),
-                Command = new DelegateCommand(() => Services.NavigationService.Navigate(new Uri("Views/IFCConvert.xaml", UriKind.RelativeOrAbsolute)))
+                Command = new SimpleDelegateCommand(() => Services.NavigationService.Navigate(new Uri("Views/IFCConvert.xaml", UriKind.RelativeOrAbsolute)))
             });
 
             Menu.Add(new MenuItemViewModel()
@@ -29,8 +25,18 @@ namespace IFCConverto.ViewModels
                 Icon = new PackIconMaterial { Kind = PackIconMaterialKind.FileCog },
                 Text = "Textfile Processing",
                 NavigationDestination = new Uri("Views/TextfileProcessing.xaml", UriKind.RelativeOrAbsolute),
-                Command = new DelegateCommand(() => Services.NavigationService.Navigate(new Uri("Views/TextfileProcessing.xaml", UriKind.RelativeOrAbsolute)))
-            });           
+                Command = new SimpleDelegateCommand(() => Services.NavigationService.Navigate(new Uri("Views/TextfileProcessing.xaml", UriKind.RelativeOrAbsolute)))
+            });
+
+
+            // Build the options menu
+            this.OptionMenu.Add(new MenuItemViewModel() 
+            { 
+                Icon = new PackIconFontAwesome { Kind = PackIconFontAwesomeKind.CogSolid }, 
+                Text = "Settings", 
+                NavigationDestination = new Uri("Views/Settings.xaml", UriKind.RelativeOrAbsolute),
+                Command = new SimpleDelegateCommand(() => Services.NavigationService.Navigate(new Uri("Views/Settings.xaml", UriKind.RelativeOrAbsolute)))
+            });
         }
     }
 }

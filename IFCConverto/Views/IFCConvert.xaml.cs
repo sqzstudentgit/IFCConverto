@@ -1,4 +1,6 @@
-﻿using System;
+﻿using IFCConverto.ViewModels;
+using MahApps.Metro.Controls.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +22,13 @@ namespace IFCConverto.Views
     /// </summary>
     public partial class IFCConvert : Page
     {
+        public IFCConvertViewModel ViewModel { get; set; }
+
         public IFCConvert()
         {
             InitializeComponent();
+            ViewModel = new IFCConvertViewModel(DialogCoordinator.Instance);
+            DataContext = ViewModel;
         }
     }
 }

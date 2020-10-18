@@ -1,0 +1,53 @@
+﻿<Page x:Class="IFCConverto.Views.Settings"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"      
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      Dialog:DialogParticipation.Register="{Binding}"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Settings">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid Style="{StaticResource PageParentGridStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Utility Settings" Style="{StaticResource PageTitleTextBlockStyle}" VerticalAlignment="Center"/>
+
+        <!-- Server URL Stack Panel-->
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left">
+            <TextBlock Text="Connection" Style="{StaticResource SectionHeader}" />
+            <TextBlock Text="Server URL" Style="{StaticResource InputTextboxLabels}"/>
+            <TextBox controls:TextBoxHelper.Watermark="Server URL" Style="{StaticResource ServerURLTextboxStyle}" Text="{Binding Path=ServerURL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+
+        <!-- Credentials Stack Panel -->
+        <StackPanel Grid.Row="2" HorizontalAlignment="Left">
+            <TextBlock Text="Credentials" Style="{StaticResource SectionHeader}" />
+
+            <TextBlock Text="Username" Style="{StaticResource InputTextboxLabels}"/>
+            <TextBox controls:TextBoxHelper.Watermark="Username" Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Text="Password" Style="{StaticResource InputTextboxLabels}"/>
+            <PasswordBox Style="{StaticResource PasswordBoxStyle}" Name="txtPassword"/>
+        </StackPanel>
+
+        <!-- Save Button to initiate conversion -->
+        <Button Grid.Row="3" Content="Save" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=SaveCommand}"
+                CommandParameter="{Binding ElementName=txtPassword}"/>
+    </Grid>
+</Page>

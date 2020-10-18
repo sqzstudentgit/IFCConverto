@@ -45,13 +45,9 @@
         </Grid.Resources>
 
         <controls:HamburgerMenu x:Name="HamburgerMenuControl" Foreground="White" PaneBackground="#FF444444" IsPaneOpen="True"          
-                                ItemClick="OnMenuItemClick" ItemsSource="{Binding Menu}" ItemTemplate="{StaticResource MenuItemTemplate}"
+                                ItemClick="OnMenuItemClick" OptionsItemClick="OnOptionItemClick" ItemsSource="{Binding Menu}" OptionsItemsSource="{Binding OptionMenu}"
+                                ItemTemplate="{StaticResource MenuItemTemplate}" OptionsItemTemplate="{StaticResource MenuItemTemplate}"
                                 DisplayMode="CompactInline">
-
-            <!--<controls:HamburgerMenu.Resources>
-                <SolidColorBrush x:Key="MahApps.Brushes.Accent3" Color="#FF71B004"/>
-                <SolidColorBrush x:Key="MahApps.Brushes.Accent" Color="#FF28930D"/>
-            </controls:HamburgerMenu.Resources>-->
 
         </controls:HamburgerMenu>
     </Grid>

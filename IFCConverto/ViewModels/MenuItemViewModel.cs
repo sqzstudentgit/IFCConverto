@@ -11,7 +11,7 @@ namespace IFCConverto.ViewModels
     {
         private object icon;
         private string text;
-        private DelegateCommand command;
+        private SimpleDelegateCommand command;
         private Uri navigationDestination;
 
         public bool IsNavigation => navigationDestination != null;
@@ -48,7 +48,7 @@ namespace IFCConverto.ViewModels
             }
             set
             {
-                SetProperty(ref command, (DelegateCommand)value);
+                SetProperty(ref command, (SimpleDelegateCommand)value);
             }
         }
 

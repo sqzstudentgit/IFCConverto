@@ -5,16 +5,16 @@ using System.Windows.Input;
 
 namespace IFCConverto.MVVM
 {
-    public class DelegateCommand : ICommand
+    public class SimpleDelegateCommand : ICommand
     {
-        private readonly Action execute;
+        private readonly Action execute;        
         private readonly Func<bool> canExecute;
 
-        public DelegateCommand(Action execute) : this(execute, null)
+        public SimpleDelegateCommand(Action execute) : this(execute, null)
         {
         }
 
-        public DelegateCommand(Action execute, Func<bool> canExecute)
+        public SimpleDelegateCommand(Action execute, Func<bool> canExecute)
         {
             if (execute == null)
             {
@@ -24,20 +24,7 @@ namespace IFCConverto.MVVM
             this.execute = execute;
             this.canExecute = canExecute;
         }
-
-        event EventHandler ICommand.CanExecuteChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
+        
         public event EventHandler CanExecuteChanged;
 
         [SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "This cannot be an event")]
@@ -53,11 +40,14 @@ namespace IFCConverto.MVVM
         }
 
         public void Execute(object parameter)
-        {
+        {            
             if (this.CanExecute(parameter))
             {
-                this.execute();
+                if (parameter == null)
+                {
+                    this.execute();
+                }                
             }
-        }
+        }       
     }
 }
