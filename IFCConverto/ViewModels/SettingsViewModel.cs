@@ -17,6 +17,14 @@ namespace IFCConverto.ViewModels
 {
     public class SettingsViewModel : ViewModelBase
     {
+
+        #region Delegate
+
+        public delegate void PasswordLoadedEventHandler(string message);
+        public event PasswordLoadedEventHandler PasswordLoaded;
+
+        #endregion
+
         #region Private Fields
 
         private string serverURL;
@@ -131,8 +139,8 @@ namespace IFCConverto.ViewModels
 
             AppSettings appSettings = new AppSettings
             {
-                ServerURL = this.ServerURL,
-                Username = this.Username,
+                ServerURL = ServerURL,
+                Username = Username,
                 Password = passwordBox.Password
             };
 
@@ -154,7 +162,7 @@ namespace IFCConverto.ViewModels
             var appSettings = settingsService.LoadSettings();
             ServerURL = appSettings.ServerURL;
             Username = appSettings.Username;
-            var password = appSettings.Password;
+            PasswordLoaded?.Invoke(appSettings.Password);
         }
 
         /// <summary>
