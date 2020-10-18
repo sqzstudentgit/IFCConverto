@@ -1,16 +1,24 @@
 ﻿<Page x:Class="IFCConverto.Views.TextfileProcessing"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:ext="clr-namespace:IFCConverto.Convertors"
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="TextfileProcessing">
 
+    <Page.Resources>
+        <ext:EnumToBoolConvertor x:Key="enumBooleanConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+    </Page.Resources>
+
     <Grid Style="{StaticResource PageParentGridStyle}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -30,8 +38,22 @@
             </StackPanel>
         </StackPanel>
 
+        <!-- Select the destination type. This will tell where to send the data-->
+        <StackPanel Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock Text="Destination Location Type" Style="{StaticResource InputTextboxLabels}"/>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <RadioButton Content="Local" Margin="{StaticResource RadioButtonMarginRightAndTop}" Command="{Binding Path=RadioButtonCommand}"  
+                             IsChecked="{Binding Path=DestinationType, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Local}"/>
+                <RadioButton Content="Server" Margin="{StaticResource RadioButtonMarginRightAndTop}" Command="{Binding Path=RadioButtonCommand}"  
+                             IsChecked="{Binding Path=DestinationType, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Server}"/>
+                <RadioButton Content="Both" Margin="{StaticResource RadioButtonMarginRightAndTop}" Command="{Binding Path=RadioButtonCommand}"  
+                             IsChecked="{Binding Path=DestinationType, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Both}"/>
+            </StackPanel>
+        </StackPanel>
+
         <!-- Destination File Picker Stack Panel -->
-        <StackPanel Grid.Row="2" HorizontalAlignment="Left">
+        <StackPanel Grid.Row="3" HorizontalAlignment="Left" Visibility="{Binding Path=IsDestinationFilePickerVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <TextBlock Text="Destination Location Path" Style="{StaticResource InputTextboxLabels}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -41,6 +63,12 @@
         </StackPanel>
 
         <!-- Convert Button to initiate conversion -->
-        <Button Grid.Row="3" Content="Process" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=ProcessCommand}"/>
+        <Button Grid.Row="4" Content="Process" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=ProcessCommand}"/>
+
+        <StackPanel Grid.Row="5" Margin="{StaticResource ProgressBarMarginTop}" HorizontalAlignment="Left">
+            <TextBlock Text="Progress" Style="{StaticResource InputTextboxLabels}"/>
+            <controls:MetroProgressBar Maximum="100" Minimum="0"
+                                       Value="{Binding Path=RemainingFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="710"/>
+        </StackPanel>
     </Grid>
 </Page>

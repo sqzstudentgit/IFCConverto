@@ -2,11 +2,10 @@
 using IFCConverto.Services;
 using MahApps.Metro.Controls.Dialogs;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
+using static IFCConverto.Enums.DestinationLocationTypeEnum;
 using static IFCConverto.Enums.TextfileProcessingEnum;
 
 namespace IFCConverto.ViewModels
@@ -18,11 +17,14 @@ namespace IFCConverto.ViewModels
         private string sourcePath;
         private string destinationPath;
         private float remainingFiles;
-        private bool isConvertButtonEnabled;
+        private DestinationLocationType destinationType;
+        private bool isDestinationFilePickerVisible;
+        private SettingsService settingsService;
 
         private ICommand sourceLocationAccessCommand;
         private ICommand destinationLocationAccessCommand;
         private ICommand processCommand;
+        private ICommand radioButtonCommand;
         private IOService ioService;
         private TextfileProcessingService textfileProcessingService;
 
@@ -71,6 +73,34 @@ namespace IFCConverto.ViewModels
             }
         }
 
+        public bool IsDestinationFilePickerVisible
+        {
+            get
+            {
+                return isDestinationFilePickerVisible;
+            }
+            set
+            {
+                isDestinationFilePickerVisible = value;
+                OnPropertyChanged("IsDestinationFilePickerVisible");
+            }
+        }
+
+        public DestinationLocationType DestinationType 
+        { 
+            get
+            {
+                return destinationType;
+            }
+            set
+            {
+                destinationType = value;
+                OnPropertyChanged("DestinationType");
+            }
+        }
+
+        public IDialogCoordinator IDialogCoordinator { get; set; }
+
         #endregion
 
         #region Commands
@@ -117,34 +147,65 @@ namespace IFCConverto.ViewModels
             }
         }
 
-        public IDialogCoordinator IDialogCoordinator { get; set; }
-
-        public bool IsConvertButtonEnabled
+        public ICommand RadioButtonCommand
         {
             get
             {
-                return isConvertButtonEnabled;
+                return radioButtonCommand;
             }
+
             set
             {
-                IsConvertButtonEnabled = value;
-                OnPropertyChanged("IsConvertButtonEnabled");
+                radioButtonCommand = (SimpleDelegateCommand)value;
+                OnPropertyChanged("RadioButtonCommand");
             }
-        }
+        }        
 
         #endregion      
 
         public TextfileProcessingViewModel(IDialogCoordinator iDialogCoordinator)
         {
+            // Commands            
             SourceLocationAccessCommand = new SimpleDelegateCommand(AccessSourceLocation, () => true);
             DestinationLocationAccessCommand = new SimpleDelegateCommand(AccessDestinationLocation, () => true);
             ProcessCommand = new SimpleDelegateCommand(ProcessFiles, () => true);
-            ioService = new IOService();
-            IDialogCoordinator = iDialogCoordinator;
+            RadioButtonCommand = new SimpleDelegateCommand(RadioButtonClick, () => true);
+            
+            // Services
+            ioService = new IOService();            
             textfileProcessingService = new TextfileProcessingService();
+            settingsService = new SettingsService();
+            IDialogCoordinator = iDialogCoordinator;
 
+            // Assignments
+            DestinationType = DestinationLocationType.Local;
+            IsDestinationFilePickerVisible = true;
+
+            // Subscribe to event handlers in the service layer
+            textfileProcessingService.ProcessingException += TextfileProcessingException;
+            textfileProcessingService.TotalFiles += TotalTextFiles;
+            textfileProcessingService.RemainingFiles += RemainingFilesTextFiles;
+        }
+        
+        /// <summary>
+        /// This method is used to toggle the controls on the screen based on the selection made
+        /// </summary>
+        private void RadioButtonClick()
+        {
+            if(DestinationType == DestinationLocationType.Local || DestinationType == DestinationLocationType.Both)
+            {
+                IsDestinationFilePickerVisible = true;
+            }
+            else
+            {
+                IsDestinationFilePickerVisible = false;
+            }            
         }
 
+        /// <summary>
+        /// This method is used to calcualte the remianing files and update the progress bar on the view
+        /// </summary>
+        /// <param name="message">Number of files remaining</param>
         private void RemainingFilesTextFiles(string message)
         {
             var filesLeft = Int32.Parse(message);
@@ -152,6 +213,10 @@ namespace IFCConverto.ViewModels
             RemainingFiles = ((filesDone * 100) / TotalFiles);
         }
 
+        /// <summary>
+        /// Get's the total number of files we are going to process for this process
+        /// </summary>
+        /// <param name="message">Total Number of files</param>
         private void TotalTextFiles(string message)
         {
             TotalFiles = Int32.Parse(message);
@@ -172,26 +237,57 @@ namespace IFCConverto.ViewModels
         /// </summary>
         private async void ProcessFiles()
         {
-            if (!string.IsNullOrEmpty(SourcePath) && !string.IsNullOrEmpty(DestinationPath))
+            var validationResult = await Validate();
+
+            if (!validationResult)
             {
-                // Disable the convert button while processing 
-                //IsConvertButtonEnabled = false;
+                return;
+            }
 
-                var status = await textfileProcessingService.ProcessFiles(SourcePath, DestinationPath);
+            var status = await textfileProcessingService.ProcessFiles(SourcePath, DestinationPath, DestinationType);
 
-                if (status == TextfileProcessingStatus.NoFiles)
+            if (status == TextfileProcessingStatus.NoFiles)
+            {
+                _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The source folder does not contain text files. Please reselect and try again");
+                return;
+            }
+            else if (status == TextfileProcessingStatus.Done)
+            {
+                _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the text files have been processed successfully");
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Validates that all the required data is present before processing the files
+        /// </summary>
+        /// <returns>True or false based on the validation</returns>
+        private async Task<bool> Validate()
+        {
+            if (string.IsNullOrEmpty(SourcePath))
+            {
+                _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The source location path has not be specified. Please specify before proceeding");
+                return false;
+            }
+
+            if ((DestinationType == DestinationLocationType.Local || DestinationType == DestinationLocationType.Both) && string.IsNullOrEmpty(DestinationPath))
+            {
+                _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The destination location path has not be specified. Please specify before proceeding");
+                return false;
+            }
+
+            if ((DestinationType == DestinationLocationType.Server || DestinationType == DestinationLocationType.Both))
+            {              
+                var appSettings = settingsService.LoadSettings();
+
+                if (string.IsNullOrEmpty(appSettings.ServerURL) || string.IsNullOrEmpty(appSettings.Username) || string.IsNullOrEmpty(appSettings.Password))
                 {
-                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The source folder does not contain text files. Please reselect and try again");
-                    // IsConvertButtonEnabled = true;
-                    return;
-                }
-                else if (status == TextfileProcessingStatus.Done)
-                {
-                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the text files have been processed successfully");
-                    //IsConvertButtonEnabled = true;
-                    return;
+                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The Server Information is incomplete. Please verify before proceeding");
+                    return false;
                 }
             }
+
+            return true;
         }
 
         /// <summary>

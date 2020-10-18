@@ -149,13 +149,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Convertors\EnumToBoolConvertor.cs" />
+    <Compile Include="Enums\DestinationLocationTypeEnum.cs" />
     <Compile Include="Enums\IFCConvertEnum.cs" />
     <Compile Include="Enums\TextfileProcessingEnum.cs" />
     <Compile Include="Helpers\EncryptionHelper.cs" />
     <Compile Include="Helpers\SettingsHelper.cs" />
     <Compile Include="Models\AppSettings.cs" />
+    <Compile Include="Models\ProductData.cs" />
     <Compile Include="Models\ProductParameters.cs" />
     <Compile Include="Models\Products.cs" />
+    <Compile Include="Services\HttpService.cs" />
     <Compile Include="Services\IFCConversionService.cs" />
     <Compile Include="Services\IOService.cs" />
     <Compile Include="Services\NavigationService.cs" />
@@ -201,6 +205,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\ProgressBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\RadioButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
