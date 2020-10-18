@@ -111,12 +111,22 @@ namespace IFCConverto.Services
                     {
                         StoreDataLocally(productList, destinationLocation);
                     }
-                    else if (destinationType == DestinationLocationType.Server || destinationType == DestinationLocationType.Both)
+                    else if (destinationType == DestinationLocationType.Server)
+                    {                        
+                        var result = await SendDataToAPI(productList);
+
+                        if(!result)
+                        {
+                            ProcessingException?.Invoke("Could not send data to Server");
+                            return TextfileProcessingStatus.Error;
+                        }
+                    }
+                    else if(destinationType == DestinationLocationType.Both)
                     {
                         StoreDataLocally(productList, destinationLocation);
                         var result = await SendDataToAPI(productList);
 
-                        if(!result)
+                        if (!result)
                         {
                             ProcessingException?.Invoke("Could not send data to Server");
                             return TextfileProcessingStatus.Error;
@@ -165,6 +175,8 @@ namespace IFCConverto.Services
                 Password = serverDetails.Password,
                 Products = productList
             };
+
+            var data = JsonConvert.SerializeObject(productData);
 
             return await HttpService.Post(productData, serverDetails.ServerURL);
         }
