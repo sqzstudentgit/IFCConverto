@@ -16,7 +16,7 @@
 
 
     <Style x:Key="FilePathTextboxStyle" TargetType="TextBox" BasedOn="{StaticResource BaseStyle}">
-        <Setter Property="Width" Value="600"/>
+        <Setter Property="Width" Value="660"/>
     </Style>
 
     <Style x:Key="ServerURLTextboxStyle" TargetType="TextBox" BasedOn="{StaticResource BaseStyle}">

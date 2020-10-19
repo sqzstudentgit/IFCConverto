@@ -24,7 +24,11 @@ namespace IFCConverto.ViewModels
         private float remainingFiles;
         private DestinationLocationType destinationType;
         private bool isDestinationFilePickerVisible;
+        private bool isAWSDetailsControlVisible;
         private SettingsService settingsService;
+        private string bucketName;
+        private string accessKey;
+        private string secretKey;
 
         private ICommand sourceLocationAccessCommand;
         private ICommand destinationLocationAccessCommand;
@@ -60,6 +64,45 @@ namespace IFCConverto.ViewModels
             {
                 destinationPath = value;
                 OnPropertyChanged("DestinationPath");
+            }
+        }
+
+        public string BucketName
+        {
+            get
+            {
+                return bucketName;
+            }
+            set
+            {
+                bucketName = value;
+                OnPropertyChanged("BucketName");
+            }
+        }
+
+        public string SecretKey
+        {
+            get
+            {
+                return secretKey;
+            }
+            set
+            {
+                secretKey = value;
+                OnPropertyChanged("SecretKey");
+            }
+        }
+
+        public string AccessKey
+        {
+            get
+            {
+                return accessKey;
+            }
+            set
+            {
+                accessKey = value;
+                OnPropertyChanged("AccessKey");
             }
         }
 
@@ -101,6 +144,19 @@ namespace IFCConverto.ViewModels
             {
                 isDestinationFilePickerVisible = value;
                 OnPropertyChanged("IsDestinationFilePickerVisible");
+            }
+        }
+
+        public bool IsAWSDetailsControlVisible
+        {
+            get
+            {
+                return isAWSDetailsControlVisible;
+            }
+            set
+            {
+                isAWSDetailsControlVisible = value;
+                OnPropertyChanged("IsAWSDetailsControlVisible");
             }
         }
 
@@ -185,6 +241,7 @@ namespace IFCConverto.ViewModels
             // Assignments
             DestinationType = DestinationLocationType.Local;
             IsDestinationFilePickerVisible = true;
+            IsAWSDetailsControlVisible = false;
 
             // Subscribe to event handlers in the service layer
             iFCConversionService.ConversionException += IFCConversionException;
@@ -197,15 +254,15 @@ namespace IFCConverto.ViewModels
         /// </summary>
         private void RadioButtonClick()
         {
-            if (DestinationType == DestinationLocationType.Local || DestinationType == DestinationLocationType.Both)
+            if (DestinationType == DestinationLocationType.Local)
             {
                 IsDestinationFilePickerVisible = true;
-
-                // AWS credential control should appear
+                IsAWSDetailsControlVisible = false;
             }
-            else
+            else if(DestinationType == DestinationLocationType.Both || DestinationType == DestinationLocationType.Server)
             {
-                // AWS credential control should appear
+                IsDestinationFilePickerVisible = true;
+                IsAWSDetailsControlVisible = true;
             }
         }
 
@@ -282,7 +339,7 @@ namespace IFCConverto.ViewModels
             }
 
             // Check if we have complete info for writing to local and sending to server
-            if ((DestinationType == DestinationLocationType.Server || DestinationType == DestinationLocationType.Both))
+            if (DestinationType == DestinationLocationType.Server || DestinationType == DestinationLocationType.Both)
             {
                 if(string.IsNullOrEmpty(DestinationPath))
                 {
@@ -296,7 +353,13 @@ namespace IFCConverto.ViewModels
                 {
                     _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The Server Information is incomplete. Please verify before proceeding");
                     return false;
-                }                
+                } 
+                
+                if(string.IsNullOrEmpty(AccessKey) || string.IsNullOrEmpty(SecretKey) || string.IsNullOrEmpty(BucketName))
+                {
+                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "AWS Information is incomplete. Please verify before proceeding");
+                    return false;
+                }
             }
 
             return true;

@@ -68,7 +68,7 @@
         <StackPanel Grid.Row="5" Margin="{StaticResource ProgressBarMarginTop}" HorizontalAlignment="Left">
             <TextBlock Text="Progress" Style="{StaticResource InputTextboxLabels}"/>
             <controls:MetroProgressBar Maximum="100" Minimum="0"
-                                       Value="{Binding Path=RemainingFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="710"/>
+                                       Value="{Binding Path=RemainingFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="770"/>
         </StackPanel>
     </Grid>
 </Page>

@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Compilation;
 using static IFCConverto.Enums.DestinationLocationTypeEnum;
@@ -62,13 +63,8 @@ namespace IFCConverto.Services
                     // Send a call to the S3 bucket to upload data and the API
                     if (destinationType == DestinationLocationType.Both)
                     {
-
-                    }
-                    else if(destinationType == DestinationLocationType.Server)
-                    {
-                        // after uploading the files, delete from the local repository
-                    }
-                    
+                        // Create a new method
+                    }                                       
 
                     // Return success message
                     return IFCConvertStatus.Done;

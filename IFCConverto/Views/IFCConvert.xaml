@@ -8,7 +8,7 @@
       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
       Dialog:DialogParticipation.Register="{Binding}"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="1000" d:DesignWidth="800"
       Title="IFCConvert">
 
     <Page.Resources>
@@ -17,6 +17,8 @@
 
     <Grid Style="{StaticResource PageParentGridStyle}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -45,14 +47,40 @@
                 <RadioButton Content="Local" Margin="{StaticResource RadioButtonMarginRightAndTop}" Command="{Binding Path=RadioButtonCommand}"    
                              IsChecked="{Binding Path=DestinationType, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Local}"/>
                 <RadioButton Content="Server" Margin="{StaticResource RadioButtonMarginRightAndTop}" Command="{Binding Path=RadioButtonCommand}"  
-                             IsChecked="{Binding Path=DestinationType, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Server}"/>
+                             IsChecked="{Binding Path=DestinationType, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Server}" IsEnabled="False"/>
                 <RadioButton Content="Both" Margin="{StaticResource RadioButtonMarginRightAndTop}" Command="{Binding Path=RadioButtonCommand}"  
                              IsChecked="{Binding Path=DestinationType, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Both}"/>
             </StackPanel>
         </StackPanel>
 
+        <!-- AWS Server Details -->
+        <StackPanel Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Visibility="{Binding Path=IsAWSDetailsControlVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock Text="Amazon S3 Bucket Details" Style="{StaticResource InputTextboxLabels}"/>
+
+            <StackPanel  Orientation="Horizontal">
+
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="Bucket Name" Style="{StaticResource InputTextboxLabels}"/>
+                    <TextBox Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=BucketName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="Access Key" Style="{StaticResource InputTextboxLabels}"/>
+                    <TextBox Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=AccessKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock Text="Secret Key" Style="{StaticResource InputTextboxLabels}"/>
+                    <TextBox Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=SecretKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                
+            </StackPanel>
+            
+        </StackPanel>
+
         <!-- Destination File Picker Stack Panel -->
-        <StackPanel Grid.Row="3" HorizontalAlignment="Left" Visibility="{Binding Path=IsDestinationFilePickerVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <StackPanel Grid.Row="4" HorizontalAlignment="Left" Visibility="{Binding Path=IsDestinationFilePickerVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <TextBlock Text="Destination Location Path" Style="{StaticResource InputTextboxLabels}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -60,15 +88,21 @@
                 <Button Content="Destination" Style="{StaticResource FolderPickerButtonStyle}" Command="{Binding Path=DestinationLocationAccessCommand}"/>
             </StackPanel>
         </StackPanel>
-        
+
         <!-- Convert Button to initiate conversion -->
-        <Button Grid.Row="4" Content="Convert" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=ConvertCommand}"/>
+        <Button Grid.Row="5" Content="Convert" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=ConvertCommand}"/>
                 <!--IsEnabled="{Binding Path=IsConvertButtonEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"-->
 
-        <StackPanel Grid.Row="5" Margin="{StaticResource ProgressBarMarginTop}" HorizontalAlignment="Left">
-            <TextBlock Text="Progress" Style="{StaticResource InputTextboxLabels}"/>
+        <StackPanel Grid.Row="6" Margin="{StaticResource ProgressBarMarginTop}" HorizontalAlignment="Left">
+            <TextBlock Text="Conversion Progress" Style="{StaticResource InputTextboxLabels}"/>
             <controls:MetroProgressBar Maximum="100" Minimum="0"
-                                       Value="{Binding Path=RemainingFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="710"/>
+                                       Value="{Binding Path=RemainingFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="770"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="7" Margin="{StaticResource ProgressBarMarginTop}" HorizontalAlignment="Left" Visibility="{Binding Path=IsAWSDetailsControlVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock Text="Upload Progress" Style="{StaticResource InputTextboxLabels}"/>
+            <controls:MetroProgressBar Maximum="100" Minimum="0"
+                                       Value="{Binding Path=RemainingFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="770"/>
         </StackPanel>
     </Grid>
 </Page>
