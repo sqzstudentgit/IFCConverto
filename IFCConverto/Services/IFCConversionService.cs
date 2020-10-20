@@ -1,12 +1,11 @@
 ﻿using IFCConvertoLibrary;
-using MahApps.Metro.IconPacks;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
+using System.Net;
 using System.Threading.Tasks;
+using System.Web.Compilation;
+using static IFCConverto.Enums.DestinationLocationTypeEnum;
 using static IFCConverto.Enums.IFCConvertEnum;
 
 namespace IFCConverto.Services
@@ -24,7 +23,7 @@ namespace IFCConverto.Services
         /// <param name="sourceLocation">Source location path</param>
         /// <param name="destinationLocation">Destination location path</param>
         /// <returns>IFC convert Status to update the UI</returns>
-        public async Task<IFCConvertStatus> ConvertFiles(string sourceLocation, string destinationLocation)
+        public async Task<IFCConvertStatus> ConvertFiles(string sourceLocation, string destinationLocation, DestinationLocationType destinationType)
         {
             try
             {
@@ -60,6 +59,12 @@ namespace IFCConverto.Services
                         // Send message to UI to update progress bar
                         RemainingFiles?.Invoke((totalFiles).ToString());
                     }
+
+                    // Send a call to the S3 bucket to upload data and the API
+                    if (destinationType == DestinationLocationType.Both)
+                    {
+                        // Create a new method
+                    }                                       
 
                     // Return success message
                     return IFCConvertStatus.Done;

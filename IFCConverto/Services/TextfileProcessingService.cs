@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static IFCConverto.Enums.DestinationLocationTypeEnum;
 using static IFCConverto.Enums.TextfileProcessingEnum;
 
 namespace IFCConverto.Services
@@ -27,11 +28,11 @@ namespace IFCConverto.Services
         /// <param name="sourceLocation">Source location path</param>
         /// <param name="destinationLocation">Destination location path</param>
         /// <returns>Textfile processing Status to update the UI</returns>
-        public async Task<TextfileProcessingStatus> ProcessFiles(string sourceLocation, string destinationLocation)
+        public async Task<TextfileProcessingStatus> ProcessFiles(string sourceLocation, string destinationLocation, DestinationLocationType destinationType)
         {
             try
             {
-                return await Task.Run(() =>
+                return await Task.Run(async () =>
                 {
                     // get all file names from the source location
                     var allFilenames = Directory.EnumerateFiles(sourceLocation).Select(p => Path.GetFileName(p));
@@ -104,11 +105,34 @@ namespace IFCConverto.Services
                         // Send message to UI to update progress bar
                         RemainingFiles?.Invoke((totalFiles).ToString());
                     }
-                    
-                    SendDataToAPI(productList);
-                    
-                    StoreDataLocally(productList, destinationLocation);                   
 
+                    // check user's preference and save or send the file accordingly.
+                    if (destinationType == DestinationLocationType.Local)
+                    {
+                        StoreDataLocally(productList, destinationLocation);
+                    }
+                    else if (destinationType == DestinationLocationType.Server)
+                    {                        
+                        var result = await SendDataToAPI(productList);
+
+                        if(!result)
+                        {
+                            ProcessingException?.Invoke("Could not send data to Server");
+                            return TextfileProcessingStatus.Error;
+                        }
+                    }
+                    else if(destinationType == DestinationLocationType.Both)
+                    {
+                        StoreDataLocally(productList, destinationLocation);
+                        var result = await SendDataToAPI(productList);
+
+                        if (!result)
+                        {
+                            ProcessingException?.Invoke("Could not send data to Server");
+                            return TextfileProcessingStatus.Error;
+                        }
+                    }
+                                        
                     // Return success message
                     return TextfileProcessingStatus.Done;
                 });
@@ -134,17 +158,27 @@ namespace IFCConverto.Services
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, productList);
-            }
+            }            
         }
 
         /// <summary>
         /// This method will post the data to the Server for DB storage
         /// </summary>
         /// <param name="productList">List of products</param>
-        private void SendDataToAPI(List<Products> productList)
+        private async Task<bool> SendDataToAPI(List<Products> productList)
         {
-            // create a json string
-            var jsonString = JsonConvert.SerializeObject(productList);
+            var serverDetails = new SettingsService().LoadSettings();
+
+            var productData = new ProductData
+            {
+                Username = serverDetails.Username,
+                Password = serverDetails.Password,
+                Products = productList
+            };
+
+            var data = JsonConvert.SerializeObject(productData);
+
+            return await HttpService.Post(productData, serverDetails.ServerURL);
         }
 
         /// <summary>

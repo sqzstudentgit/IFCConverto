@@ -7,7 +7,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:viewModels="clr-namespace:IFCConverto.ViewModels"
                       mc:Ignorable="d"
-                      Title="IFC Converto" Height="600" Width="1000" Loaded="OnLoaded">
+                      Title="IFC Converto" Height="700" Width="1200" Loaded="OnLoaded">
 
     <!-- Data context for the Metro Window -->
     <controls:MetroWindow.DataContext>

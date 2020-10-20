@@ -18,6 +18,7 @@
                 <ResourceDictionary Source="Themes/Button.xaml" />
                 <ResourceDictionary Source="Themes/Grid.xaml" />
                 <ResourceDictionary Source="Themes/ProgressBar.xaml" />
+                <ResourceDictionary Source="Themes/RadioButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
