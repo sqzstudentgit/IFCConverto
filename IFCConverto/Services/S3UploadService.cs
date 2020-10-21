@@ -32,7 +32,6 @@ namespace IFCConverto.Services
 
             FileInfo file = new FileInfo(filePath);
             string path = awsSubFolder+"/" + filename;
-            var ins = file.OpenRead();
 
             PutObjectRequest request = new PutObjectRequest()
             {
