@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Resources;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -22,6 +23,7 @@ namespace IFCConverto.ViewModels
         private string sourcePath;
         private string destinationPath;        
         private float remainingFiles;
+        private float remainingModels;
         private DestinationLocationType destinationType;
         private bool isDestinationFilePickerVisible;
         private bool isAWSDetailsControlVisible;
@@ -118,6 +120,19 @@ namespace IFCConverto.ViewModels
             {
                 remainingFiles = value;
                 OnPropertyChanged("RemainingFiles");
+            }
+        }
+
+        public float RemainingModels
+        {
+            get
+            {
+                return remainingModels;
+            }
+            set
+            {
+                remainingModels = value;
+                OnPropertyChanged("RemainingModels");
             }
         }
 
@@ -247,6 +262,7 @@ namespace IFCConverto.ViewModels
             iFCConversionService.ConversionException += IFCConversionException;
             iFCConversionService.TotalFiles += IFCTotalFiles;
             iFCConversionService.RemainingFiles += IFCRemainingFiles;
+            iFCConversionService.RemainingModels += IFCRemainingModels;
         }
 
         /// <summary>
@@ -278,6 +294,17 @@ namespace IFCConverto.ViewModels
         }
 
         /// <summary>
+        /// This method is used to calcualte the remianing models and update the progress bar on the view
+        /// </summary>
+        /// <param name="message">Number of files remaining</param>
+        private void IFCRemainingModels(string message)
+        {
+            var filesLeft = Int32.Parse(message);
+            var filesDone = TotalFiles - filesLeft;
+            RemainingModels = ((filesDone * 100) / TotalFiles);
+        }
+
+        /// <summary>
         /// Get's the total number of files we are going to process for this process
         /// </summary>
         /// <param name="message">Total Number of files</param>
@@ -304,8 +331,8 @@ namespace IFCConverto.ViewModels
             {
                 return;
             }
-            
-            var status = await iFCConversionService.ConvertFiles(SourcePath, DestinationPath, DestinationType);
+
+            var status = await iFCConversionService.ConvertFiles(SourcePath, DestinationPath, BucketName, AccessKey, SecretKey, DestinationType);
 
             if (status == IFCConvertStatus.NoFiles)
             {
@@ -314,8 +341,16 @@ namespace IFCConverto.ViewModels
             }
             else if (status == IFCConvertStatus.Done)
             {
-                _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the IFC files have been converted successfully");
-                return;
+                if (DestinationType == DestinationLocationType.Both)
+                {
+                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the IFC files have been converted and uploaded successfully");
+                    return;
+                }
+                else
+                {
+                    _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the IFC files have been converted successfully");
+                    return;
+                }
             }
 
         }
@@ -349,13 +384,13 @@ namespace IFCConverto.ViewModels
 
                 var appSettings = settingsService.LoadSettings();
 
-                if(string.IsNullOrEmpty(appSettings.ServerURL) || string.IsNullOrEmpty(appSettings.Username) || string.IsNullOrEmpty(appSettings.Password))
+                if (string.IsNullOrEmpty(appSettings.ServerURL) || string.IsNullOrEmpty(appSettings.Username) || string.IsNullOrEmpty(appSettings.Password))
                 {
                     _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "The Server Information is incomplete. Please verify before proceeding");
                     return false;
-                } 
-                
-                if(string.IsNullOrEmpty(AccessKey) || string.IsNullOrEmpty(SecretKey) || string.IsNullOrEmpty(BucketName))
+                }
+
+                if (string.IsNullOrEmpty(AccessKey) || string.IsNullOrEmpty(SecretKey) || string.IsNullOrEmpty(BucketName))
                 {
                     _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "AWS Information is incomplete. Please verify before proceeding");
                     return false;

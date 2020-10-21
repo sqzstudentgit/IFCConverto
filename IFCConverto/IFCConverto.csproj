@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -46,10 +47,10 @@
     </Reference>
     <Reference Include="IFCConvertoLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\IFCConvertoLibrary\IFCConvertoLibrary\bin\Release86\netstandard2.0\IFCConvertoLibrary.dll</HintPath>
+      <HintPath>..\..\..\IFCConvertoLibrary.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.2.2.0\lib\net47\MahApps.Metro.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.2.2.0\lib\net46\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.5.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
@@ -170,6 +171,7 @@
     <Compile Include="Services\IOService.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="MVVM\SimpleDelegateCommand.cs" />
+    <Compile Include="Services\S3UploadService.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\TextfileProcessingService.cs" />
     <Compile Include="Settings.cs" />

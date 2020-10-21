@@ -102,7 +102,7 @@
         <StackPanel Grid.Row="7" Margin="{StaticResource ProgressBarMarginTop}" HorizontalAlignment="Left" Visibility="{Binding Path=IsAWSDetailsControlVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <TextBlock Text="Upload Progress" Style="{StaticResource InputTextboxLabels}"/>
             <controls:MetroProgressBar Maximum="100" Minimum="0"
-                                       Value="{Binding Path=RemainingFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="770"/>
+                                       Value="{Binding Path=RemainingModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="770"/>
         </StackPanel>
     </Grid>
 </Page>
