@@ -61,43 +61,54 @@ namespace IFCConverto.Services
                         // Get the path for the source file
                         var sourceFile = Path.Combine(sourceLocation, file);                        
 
-                        // Read the first 2 lines of the text file.
-                        // We are only read the 2 lines for now due to current requirements, but for future just increase the number in Take(2) to how many lines you want to read
-                        var lines = File.ReadLines(sourceFile).Take(2).ToArray();
+                        // Read all the lines of the file                        
+                        var lines = File.ReadAllLines(sourceFile).ToArray();
 
                         // Final Heading Tokens after being cleaned and formatted would be stored in this list
                         var finalHeadings = ProcessHeaderString(lines[0]);
 
-                        // Will contain the values from the CSV file 
-                        var content = ProcessData(lines[1]);                                                
-
-                        // Time to process the strings and convert to Json
-                        // However, if this condition is not satisfied, that means there is something wrong with the file. We need to alert the user.
-                        if (content != null && finalHeadings != null && content.Count() > 0 && finalHeadings.Count > 0 && finalHeadings.Count == content.Count)
+                        // Loop over rest of the lines apart from the heading line
+                        foreach (var line in lines.Skip(1))
                         {
-                            var products = new Products
-                            {
-                                ProductParameters = new List<ProductParameters>(),
-                                Code = Path.GetFileNameWithoutExtension(file)
-                            };
+                            // Will contain the values from the CSV file 
+                            var content = ProcessData(line);
 
-                            // Now make the key value pairs of the tokenized strings
-                            for (var i = 0; i < finalHeadings.Count; i++)
-                            {
-                                var productParam = new ProductParameters
+                            // Time to process the strings and convert to Json
+                            // However, if this condition is not satisfied, that means there is something wrong with the file. We need to alert the user.
+                            if (content != null && finalHeadings != null && content.Count() > 0 && finalHeadings.Count > 0 && finalHeadings.Count == content.Count)
+                            {                                
+                                var product = new Products
                                 {
-                                    Key = finalHeadings[i],
-                                    Value = content[i]
+                                    ProductParameters = new List<ProductParameters>(),                                    
                                 };
 
-                                products.ProductParameters.Add(productParam);
-                            }
+                                // Now make the key value pairs of the tokenized strings
+                                for (var i = 0; i < finalHeadings.Count; i++)
+                                {
+                                    // add a check to fill out the product code if the token is "Product Code". Then we need to update the product code
+                                    // otherwise, fill out key value pairs
+                                    if (finalHeadings[i].ToLowerInvariant().Equals("product code"))
+                                    {
+                                        product.Code = content[i];
+                                    }
+                                    else
+                                    {
+                                        var productParam = new ProductParameters
+                                        {
+                                            Key = finalHeadings[i],
+                                            Value = content[i]
+                                        };
 
-                            productList.Add(products);                            
-                        }                        
-                        else
-                        {
-                            ColumnMismatch?.Invoke("A mismatch between heading and content columns occured in file: " + Path.GetFileNameWithoutExtension(file));
+                                        product.ProductParameters.Add(productParam);
+                                    }                                    
+                                }
+
+                                productList.Add(product);
+                            }
+                            else
+                            {
+                                ColumnMismatch?.Invoke("A mismatch between heading and content columns occured in file: " + Path.GetFileNameWithoutExtension(file));
+                            }
                         }
                         
                         totalFiles--;
