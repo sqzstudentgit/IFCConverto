@@ -1,44 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Amazon;
+﻿using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
+using System.IO;
 
 namespace IFCConverto.Services
 {
     class S3UploadService
-    {
-         
-        string _bucketName;
-        string _awsAccessKey;
-        string _awsSecretKey;
-        string awsSubFolder;
+    {         
+        private string bucketName;
+        private string awsAccessKey;
+        private string awsSecretKey;
+        private const string awsSubFolder = "3dModels";
 
         public S3UploadService(string bucket, string accesskey, string secretkey)
         {
-            _bucketName = bucket;
-            _awsAccessKey = accesskey;
-            _awsSecretKey = secretkey;
-
-            awsSubFolder = "3dModels";
+            bucketName = bucket;
+            awsAccessKey = accesskey;
+            awsSecretKey = secretkey;            
         }
 
+        /// <summary>
+        /// This method is used for uploading the files to the S3 bucket.
+        /// </summary>
+        /// <param name="filePath">path of the file</param>
+        /// <param name="filename">name of the file</param>
+        /// <returns>Url of the uploaded object</returns>
         public string UploadFile(string filePath, string filename)
         {
 
-            IAmazonS3 client = new AmazonS3Client(_awsAccessKey, _awsSecretKey, RegionEndpoint.APSoutheast2);
+            IAmazonS3 client = new AmazonS3Client(awsAccessKey, awsSecretKey, RegionEndpoint.APSoutheast2);
 
             FileInfo file = new FileInfo(filePath);
             string path = awsSubFolder+"/" + filename;
+            var ins = file.OpenRead();
 
             PutObjectRequest request = new PutObjectRequest()
             {
                 InputStream = file.OpenRead(),
-                BucketName = _bucketName,
+                BucketName = bucketName,
                 Key = path 
             };
 
@@ -47,30 +46,33 @@ namespace IFCConverto.Services
             // Changing the access permissions to public
             client.PutACL(new PutACLRequest
             {
-                BucketName = _bucketName,
+                BucketName = bucketName,
                 Key = path,
                 CannedACL = S3CannedACL.PublicRead
             });
 
             // Generating the URL to access the 3D Model.
             string endpointURL = "ap-southeast-2";
-            string url = "https://s3-" + endpointURL + ".amazonaws.com/" + _bucketName + "/"+awsSubFolder+"/" + filename;
+            string url = "https://s3-" + endpointURL + ".amazonaws.com/" + bucketName + "/"+awsSubFolder+"/" + filename;
             
             return url;
         }
 
+        /// <summary>
+        /// This method will create the folder on the S3 bucket to store the images. 
+        /// </summary>
         public void CreateFolder()
         {
-            IAmazonS3 client = new AmazonS3Client(_awsAccessKey, _awsSecretKey, RegionEndpoint.APSoutheast2);
+            var client = new AmazonS3Client(awsAccessKey, awsSecretKey, RegionEndpoint.APSoutheast2);
             string folderPath = awsSubFolder + "/";
 
             PutObjectRequest request = new PutObjectRequest()
             {
-                BucketName = _bucketName,
+                BucketName = bucketName,
                 Key = folderPath
             };
 
-            PutObjectResponse response = client.PutObject(request);
+            client.PutObject(request);
         }
 
     }
