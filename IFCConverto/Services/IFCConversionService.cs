@@ -118,7 +118,7 @@ namespace IFCConverto.Services
 
                 if (result.Status.ToLowerInvariant().Equals("success"))
                 {
-                    ProcessingException?.Invoke(result.Message);
+                    //ProcessingException?.Invoke(result.Message);
                     return true;
                 }
                 else
