@@ -114,7 +114,18 @@ namespace IFCConverto.Services
 
                 var data = JsonConvert.SerializeObject(productData);
 
-                return await HttpService.PostModelLinks(productData, serverDetails.ServerURL);
+                var result = await HttpService.PostModelLinks(productData, serverDetails.ServerURL);
+
+                if (result.Status.ToLowerInvariant().Equals("success"))
+                {
+                    ProcessingException?.Invoke(result.Message);
+                    return true;
+                }
+                else
+                {
+                    ProcessingException?.Invoke("Could not save data to Server due to following reason. Reason:" + result.Message);
+                    return false;
+                }
             }
             catch (Exception ex)
             {

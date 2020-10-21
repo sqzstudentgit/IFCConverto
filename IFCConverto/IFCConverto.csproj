@@ -164,6 +164,7 @@
     <Compile Include="Helpers\EncryptionHelper.cs" />
     <Compile Include="Helpers\SettingsHelper.cs" />
     <Compile Include="Models\AppSettings.cs" />
+    <Compile Include="Models\HttpRequestResponse.cs" />
     <Compile Include="Models\ProductData.cs" />
     <Compile Include="Models\ProductParameters.cs" />
     <Compile Include="Models\Products.cs" />

@@ -228,7 +228,7 @@ namespace IFCConverto.ViewModels
         /// <param name="message">Exception Message</param>
         private async void TextfileProcessingException(string message)
         {
-            _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "There was an exception while processing: " + message);
+            _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", message);
             return;
         }
 
@@ -254,6 +254,11 @@ namespace IFCConverto.ViewModels
             else if (status == TextfileProcessingStatus.Done)
             {
                 _ = await IDialogCoordinator.ShowMessageAsync(this, "Success", "All the text files have been processed successfully");
+                return;
+            }
+            else if (status == TextfileProcessingStatus.PartialSuccess)
+            {
+                _ = await IDialogCoordinator.ShowMessageAsync(this, "Partial Success", "The text files were processed with some issue. It is recommended to rerun the process once issues are fixed");
                 return;
             }
         }

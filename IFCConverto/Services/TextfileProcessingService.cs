@@ -1,4 +1,5 @@
-﻿using IFCConverto.Models;
+﻿using Amazon.S3.Model.Internal.MarshallTransformations;
+using IFCConverto.Models;
 using Microsoft.VisualBasic;
 using Microsoft.WindowsAPICodePack.Net;
 using Newtonsoft.Json;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 using static IFCConverto.Enums.DestinationLocationTypeEnum;
 using static IFCConverto.Enums.TextfileProcessingEnum;
 
@@ -120,28 +122,19 @@ namespace IFCConverto.Services
                     // check user's preference and save or send the file accordingly.
                     if (destinationType == DestinationLocationType.Local)
                     {
-                        StoreDataLocally(productList, destinationLocation);
+                        var result = StoreDataLocally(productList, destinationLocation);
+                        return result ? TextfileProcessingStatus.Done : TextfileProcessingStatus.Error;
                     }
                     else if (destinationType == DestinationLocationType.Server)
                     {                        
                         var result = await SendDataToAPI(productList);
-
-                        if(!result)
-                        {
-                            ProcessingException?.Invoke("Could not send data to Server");
-                            return TextfileProcessingStatus.Error;
-                        }
+                        return result ? TextfileProcessingStatus.Done : TextfileProcessingStatus.Error;
                     }
                     else if(destinationType == DestinationLocationType.Both)
                     {
-                        StoreDataLocally(productList, destinationLocation);
-                        var result = await SendDataToAPI(productList);
-
-                        if (!result)
-                        {
-                            ProcessingException?.Invoke("Could not send data to Server");
-                            return TextfileProcessingStatus.Error;
-                        }
+                        var localStorageResult = StoreDataLocally(productList, destinationLocation);
+                        var serverStorageResult = await SendDataToAPI(productList);
+                        return (localStorageResult && serverStorageResult) ? TextfileProcessingStatus.Done : TextfileProcessingStatus.PartialSuccess;
                     }
                                         
                     // Return success message
@@ -150,7 +143,7 @@ namespace IFCConverto.Services
             }
             catch (Exception ex)
             {
-                ProcessingException?.Invoke(ex.Message);
+                ProcessingException?.Invoke("There was an error while processing the textfiles. Exception: " + ex.Message);
                 return TextfileProcessingStatus.Error;
             }
         }
@@ -160,16 +153,26 @@ namespace IFCConverto.Services
         /// </summary>
         /// <param name="productList">List of products</param>
         /// <param name="destinationLocation">Destination location path</param>
-        private void StoreDataLocally(List<Products> productList, string destinationLocation)
+        private bool StoreDataLocally(List<Products> productList, string destinationLocation)
         {
-            // Combine all the processed textfile in 1 Json file and place in the destiantion folder
-            var destinationFile = Path.Combine(destinationLocation, "ParameterizedData.json");
-
-            using (StreamWriter file = File.CreateText(destinationFile))
+            try
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, productList);
-            }            
+                // Combine all the processed textfile in 1 Json file and place in the destiantion folder
+                var destinationFile = Path.Combine(destinationLocation, "ParameterizedData.json");
+
+                using (StreamWriter file = File.CreateText(destinationFile))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(file, productList);
+                }
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+                ProcessingException?.Invoke("There was an error while storing the data at local destination. Exception: " + ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -178,18 +181,35 @@ namespace IFCConverto.Services
         /// <param name="productList">List of products</param>
         private async Task<bool> SendDataToAPI(List<Products> productList)
         {
-            var serverDetails = new SettingsService().LoadSettings();
-
-            var productData = new ProductData
+            try
             {
-                Username = serverDetails.Username,
-                Password = serverDetails.Password,
-                Products = productList
-            };
+                var serverDetails = new SettingsService().LoadSettings();
 
-            var data = JsonConvert.SerializeObject(productData);
+                var productData = new ProductData
+                {
+                    Username = serverDetails.Username,
+                    Password = serverDetails.Password,
+                    Products = productList
+                };
 
-            return await HttpService.Post(productData, serverDetails.ServerURL);
+                var result = await HttpService.Post(productData, serverDetails.ServerURL);
+
+                if (result.Status.ToLowerInvariant().Equals("success"))
+                {
+                    ProcessingException?.Invoke(result.Message);
+                    return true;
+                }
+                else
+                {
+                    ProcessingException?.Invoke("Could not save data to Server due to following reason. Reason:" + result.Message);
+                    return false;
+                }
+            }
+            catch(Exception ex)
+            {
+                ProcessingException?.Invoke("There was an error while sending data to the server. Exception:" + ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
