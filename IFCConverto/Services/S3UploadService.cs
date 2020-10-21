@@ -16,7 +16,6 @@ namespace IFCConverto.Services
         string _bucketName;
         string _awsAccessKey;
         string _awsSecretKey;
-
         string awsSubFolder;
 
         public S3UploadService(string bucket, string accesskey, string secretkey)
@@ -59,6 +58,7 @@ namespace IFCConverto.Services
             
             return url;
         }
+
         public void CreateFolder()
         {
             IAmazonS3 client = new AmazonS3Client(_awsAccessKey, _awsSecretKey, RegionEndpoint.APSoutheast2);
