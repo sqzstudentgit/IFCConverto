@@ -8,5 +8,7 @@ namespace IFCConverto.Models
         public string Code { get; set; }
 
         public List<ProductParameters> ProductParameters { get; set; }
+
+        public string ModelURL { get; set; }
     }
 }

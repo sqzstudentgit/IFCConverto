@@ -1,12 +1,11 @@
-﻿using IFCConvertoLibrary;
+﻿using IFCConverto.Models;
+using IFCConvertoLibrary;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using System.Web.Compilation;
-using System.Windows.Documents;
 using static IFCConverto.Enums.DestinationLocationTypeEnum;
 using static IFCConverto.Enums.IFCConvertEnum;
 
@@ -18,20 +17,20 @@ namespace IFCConverto.Services
         public event ConversionUpdateForUIEventHandler TotalFiles;
         public event ConversionUpdateForUIEventHandler RemainingFiles;
         public event ConversionUpdateForUIEventHandler RemainingModels;
-        public event ConversionUpdateForUIEventHandler ConversionException;
+        public event ConversionUpdateForUIEventHandler ProcessingException;        
 
         /// <summary>
         /// Method to start converting the ifc files in to the GLTF format
         /// </summary>
         /// <param name="sourceLocation">Source location path</param>
         /// <param name="destinationLocation">Destination location path</param>
+        /// <param name="destinationType">Type of destination, such as server, local or both</param>
         /// <returns>IFC convert Status to update the UI</returns>
-        public async Task<IFCConvertStatus> ConvertFiles(string sourceLocation, string destinationLocation, 
-            string bucket, string accesskey, string secretkey, DestinationLocationType destinationType)
+        public async Task<IFCConvertStatus> ConvertFiles(string sourceLocation, string destinationLocation, DestinationLocationType destinationType)
         {
             try
             {
-                return await Task.Run(() =>
+                return await Task.Run(async () =>
                 {
                     // get all file names from the source location
                     var allFilenames = Directory.EnumerateFiles(sourceLocation).Select(p => Path.GetFileName(p));
@@ -67,64 +66,21 @@ namespace IFCConverto.Services
                     // Send a call to the S3 bucket to upload data and the API
                     if (destinationType == DestinationLocationType.Both)
                     {
-                        // Initialization                        
-                        var uploader = new S3UploadService(bucket, accesskey, secretkey);
-                        var tasks = new List<Task>();
-                        var sourceFiles = new List<string>();
-                        var awsUrls = new List<string>();
+                        var productList = UploadModels(files, sourceLocation, destinationLocation);
 
-                        // Create 3dModel Folder on AWS to upload the models
-                        uploader.CreateFolder();
-
-                        // Get the List of all 3D Models
-                        foreach (var file in files)
+                        if (productList != null)
                         {
-                            var sourceFile = Path.Combine(sourceLocation, file);
-                            var filePathWithGLTFExtentsion = Path.ChangeExtension(file, ".glb");
-                            var sourceFilePath = Path.Combine(destinationLocation, filePathWithGLTFExtentsion);
-                            sourceFiles.Add(sourceFilePath);
-                        }
-
-                        // Model Count for Progress bar
-                        var totalModels = files.Count();
-
-                        // Create a thread to monitor the upload progress
-                        Task x = Task.Run(() =>
-                        {
-                            bool allCompleted = true;
-                            do
+                            var result = await SendDataToAPI(productList);
+                            
+                            if(!result)
                             {
-                                allCompleted = true;
-                                // Needed to update the progress bar
-                                int completedCount = 0;
-                                foreach (Task task in tasks)
-                                {
-                                    if (task.Status == TaskStatus.Running || task.Status == TaskStatus.Created)
-                                        allCompleted = false;
-                                    else if (task.Status == TaskStatus.RanToCompletion)
-                                        completedCount++;
-                                }
-                                // Send message to UI to update progress bar
-                                RemainingModels?.Invoke((totalFiles).ToString());
-
+                                return IFCConvertStatus.Error;
                             }
-                            while (!allCompleted);
-                        });
-
-
-                        // Create separate threads to upload files on the AWS.
-                        foreach (var currentFile in sourceFiles)
-                        {
-                            Task t = Task.Run(() =>
-                            {
-                                string filename = Path.GetFileName(currentFile);
-                                awsUrls.Add(uploader.UploadFile(currentFile, filename));
-                            });
-
-                            tasks.Add(t);
                         }
-
-
+                        else
+                        {
+                            return IFCConvertStatus.Error;
+                        }
                     }                                       
 
                     // Return success message
@@ -133,8 +89,106 @@ namespace IFCConverto.Services
             }
             catch (Exception ex)
             {
-                ConversionException?.Invoke(ex.Message);
+                ProcessingException?.Invoke("There was an error while converting the IFC files. Exception: " + ex.Message);
                 return IFCConvertStatus.Error;
+            }
+        }
+
+        /// <summary>
+        /// This method will send data to the API for storage in the database
+        /// </summary>
+        /// <param name="productList">List of products with their image url</param>
+        /// <returns></returns>
+        private async Task<bool> SendDataToAPI(List<Products> productList)
+        {
+            try
+            {
+                var serverDetails = new SettingsService().LoadSettings();
+
+                var productData = new ProductData
+                {
+                    Username = serverDetails.Username,
+                    Password = serverDetails.Password,
+                    Products = productList
+                };
+
+                var data = JsonConvert.SerializeObject(productData);
+
+                return await HttpService.PostModelLinks(productData, serverDetails.ServerURL);
+            }
+            catch (Exception ex)
+            {
+                ProcessingException?.Invoke("There was an error while sending the data to the server. Exception: " + ex.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// This method will utilize the S3UploadService to upload the converted models to the S3 bucket.
+        /// </summary>
+        /// <param name="files">List of files that need to be uploaded</param>
+        /// <param name="sourceLocation"></param>
+        /// <param name="destinationLocation"></param>
+        /// <returns>Return list of products or null</returns>
+        private List<Products> UploadModels(IEnumerable<string> files, string sourceLocation, string destinationLocation)
+        {
+            try
+            {
+                // Get the AWS details from the settings
+                var awsDetails = new SettingsService().LoadSettings();               
+
+                // Initialization                        
+                var uploader = new S3UploadService(awsDetails.BucketName, awsDetails.AccessKey, awsDetails.SecretKey);
+                var tasks = new List<Task>();
+                var sourceFiles = new List<string>();
+                var productUrls = new List<Products>();
+
+                // Create 3dModel Folder on AWS to upload the models
+                uploader.CreateFolder();
+
+                // Get the List of all 3D Models
+                foreach (var file in files)
+                {
+                    var sourceFile = Path.Combine(sourceLocation, file);
+                    var filePathWithGLTFExtentsion = Path.ChangeExtension(file, ".glb");
+                    var sourceFilePath = Path.Combine(destinationLocation, filePathWithGLTFExtentsion);
+                    sourceFiles.Add(sourceFilePath);
+                }
+
+                // Model Count for Progress bar
+                var totalModels = files.Count();
+                var uploaded = 0;
+
+                // Create separate threads to upload files on the AWS.
+                foreach (var currentFile in sourceFiles)
+                {
+                    Task uploadThread = Task.Run(() =>
+                    {
+                        string filename = Path.GetFileName(currentFile);
+                        var product = new Products
+                        {
+                            Code = Path.GetFileNameWithoutExtension(currentFile),
+                            ModelURL = uploader.UploadFile(currentFile, filename),
+                            ProductParameters = null
+                        };
+
+                        productUrls.Add(product);
+                        uploaded++;
+                        RemainingModels?.Invoke((totalModels - uploaded).ToString());
+                    });
+
+                    tasks.Add(uploadThread);
+                }
+
+                Task.WaitAll(tasks.ToArray());
+
+                // Return list of all the urls for the uploaded objects
+                return productUrls;
+            }
+            catch (Exception ex)
+            {
+                ProcessingException?.Invoke("There was an exeception while uploading the files to S3 bucket. Exception: " + ex.Message);
+                return null;
             }
         }
     }

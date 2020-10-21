@@ -1,8 +1,6 @@
 ﻿using IFCConverto.Models;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,6 +42,36 @@ namespace IFCConverto.Services
                     throw ex;
                 }
             }                        
-        }       
+        }
+
+        public static async Task<bool> PostModelLinks(ProductData productData, string serverURL)
+        {
+            string requestStatus = string.Empty;
+
+            using (HttpClient client = new HttpClient())
+            {
+                // update this URL
+                //var url = "https://httpbin.org/post";
+                var url = serverURL;
+
+                try
+                {
+                    var content = new StringContent(JsonConvert.SerializeObject(productData), Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    response.EnsureSuccessStatusCode();
+
+                    if (response.IsSuccessStatusCode && response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+        }
     }
 }

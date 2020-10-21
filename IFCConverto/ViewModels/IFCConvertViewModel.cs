@@ -2,14 +2,7 @@
 using IFCConverto.Services;
 using MahApps.Metro.Controls.Dialogs;
 using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Resources;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using System.Windows.Input;
 using static IFCConverto.Enums.DestinationLocationTypeEnum;
 using static IFCConverto.Enums.IFCConvertEnum;
@@ -27,10 +20,7 @@ namespace IFCConverto.ViewModels
         private DestinationLocationType destinationType;
         private bool isDestinationFilePickerVisible;
         private bool isAWSDetailsControlVisible;
-        private SettingsService settingsService;
-        private string bucketName;
-        private string accessKey;
-        private string secretKey;
+        private SettingsService settingsService;       
 
         private ICommand sourceLocationAccessCommand;
         private ICommand destinationLocationAccessCommand;
@@ -67,46 +57,7 @@ namespace IFCConverto.ViewModels
                 destinationPath = value;
                 OnPropertyChanged("DestinationPath");
             }
-        }
-
-        public string BucketName
-        {
-            get
-            {
-                return bucketName;
-            }
-            set
-            {
-                bucketName = value;
-                OnPropertyChanged("BucketName");
-            }
-        }
-
-        public string SecretKey
-        {
-            get
-            {
-                return secretKey;
-            }
-            set
-            {
-                secretKey = value;
-                OnPropertyChanged("SecretKey");
-            }
-        }
-
-        public string AccessKey
-        {
-            get
-            {
-                return accessKey;
-            }
-            set
-            {
-                accessKey = value;
-                OnPropertyChanged("AccessKey");
-            }
-        }
+        }       
 
         public int TotalFiles { get; set; }
 
@@ -259,10 +210,10 @@ namespace IFCConverto.ViewModels
             IsAWSDetailsControlVisible = false;
 
             // Subscribe to event handlers in the service layer
-            iFCConversionService.ConversionException += IFCConversionException;
+            iFCConversionService.ProcessingException += IFCProcessingException;
             iFCConversionService.TotalFiles += IFCTotalFiles;
             iFCConversionService.RemainingFiles += IFCRemainingFiles;
-            iFCConversionService.RemainingModels += IFCRemainingModels;
+            iFCConversionService.RemainingModels += IFCRemainingModels;            
         }
 
         /// <summary>
@@ -317,9 +268,9 @@ namespace IFCConverto.ViewModels
         /// Exception handler method that will display the exception
         /// </summary>
         /// <param name="message">Exception Message</param>
-        private async void IFCConversionException(string message)
+        private async void IFCProcessingException(string message)
         {
-            _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "There was an exception while processing: " + message);
+            _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", message);
             return;
         }
 
@@ -332,7 +283,7 @@ namespace IFCConverto.ViewModels
                 return;
             }
 
-            var status = await iFCConversionService.ConvertFiles(SourcePath, DestinationPath, BucketName, AccessKey, SecretKey, DestinationType);
+            var status = await iFCConversionService.ConvertFiles(SourcePath, DestinationPath, DestinationType);
 
             if (status == IFCConvertStatus.NoFiles)
             {
@@ -390,7 +341,7 @@ namespace IFCConverto.ViewModels
                     return false;
                 }
 
-                if (string.IsNullOrEmpty(AccessKey) || string.IsNullOrEmpty(SecretKey) || string.IsNullOrEmpty(BucketName))
+                if (string.IsNullOrEmpty(appSettings.AccessKey) || string.IsNullOrEmpty(appSettings.BucketName) || string.IsNullOrEmpty(appSettings.SecretKey))
                 {
                     _ = await IDialogCoordinator.ShowMessageAsync(this, "Error", "AWS Information is incomplete. Please verify before proceeding");
                     return false;

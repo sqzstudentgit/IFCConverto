@@ -62,6 +62,63 @@
             }
         }
 
+        public static string BucketName
+        {
+            get
+            {
+                string bucketName = Properties.Settings.Default.BucketName;
+
+                if (string.IsNullOrEmpty(bucketName))
+                {
+                    return string.Empty;
+                }
+
+                return bucketName;
+            }
+            set
+            {
+                Properties.Settings.Default.BucketName = value;
+            }
+        }
+
+        public static string SecretKey
+        {
+            get
+            {
+                string secretKey = Properties.Settings.Default.SecretKey;
+
+                if (string.IsNullOrEmpty(secretKey))
+                {
+                    return string.Empty;
+                }
+
+                return secretKey;
+            }
+            set
+            {
+                Properties.Settings.Default.SecretKey = value;
+            }
+        }
+
+        public static string AccessKey
+        {
+            get
+            {
+                string accessKey = Properties.Settings.Default.AccessKey;
+
+                if (string.IsNullOrEmpty(accessKey))
+                {
+                    return string.Empty;
+                }
+
+                return accessKey;
+            }
+            set
+            {
+                Properties.Settings.Default.AccessKey = value;
+            }
+        }
+
         // Method we need to call to save the settings
         public static void Save()
         {            

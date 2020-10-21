@@ -17,37 +17,59 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Grid Style="{StaticResource PageParentGridStyle}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Style="{StaticResource PageParentGridStyle}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Utility Settings" Style="{StaticResource PageTitleTextBlockStyle}" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Text="Utility Settings" Style="{StaticResource PageTitleTextBlockStyle}" VerticalAlignment="Center"/>
 
-        <!-- Server URL Stack Panel-->
-        <StackPanel Grid.Row="1" HorizontalAlignment="Left">
-            <TextBlock Text="Connection" Style="{StaticResource SectionHeader}" />
-            <TextBlock Text="Server URL" Style="{StaticResource InputTextboxLabels}"/>
-            <TextBox controls:TextBoxHelper.Watermark="Server URL" Style="{StaticResource ServerURLTextboxStyle}" Text="{Binding Path=ServerURL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        </StackPanel>
+            <!-- Server URL Stack Panel-->
+            <StackPanel Grid.Row="1" HorizontalAlignment="Left">
+                <TextBlock Text="Connection" Style="{StaticResource SectionHeader}" />
+                <TextBlock Text="Server URL" Style="{StaticResource InputTextboxLabels}"/>
+                <TextBox controls:TextBoxHelper.Watermark="Server URL" Style="{StaticResource ServerURLTextboxStyle}" Text="{Binding Path=ServerURL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
 
-        <!-- Credentials Stack Panel -->
-        <StackPanel Grid.Row="2" HorizontalAlignment="Left">
-            <TextBlock Text="Credentials" Style="{StaticResource SectionHeader}" />
+            <!-- Credentials Stack Panel -->
+            <StackPanel Grid.Row="2" HorizontalAlignment="Left">
+                <TextBlock Text="Credentials" Style="{StaticResource SectionHeader}" />
 
-            <TextBlock Text="Username" Style="{StaticResource InputTextboxLabels}"/>
-            <TextBox controls:TextBoxHelper.Watermark="Username" Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Text="Username" Style="{StaticResource InputTextboxLabels}"/>
+                <TextBox controls:TextBoxHelper.Watermark="Username" Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <TextBlock Text="Password" Style="{StaticResource InputTextboxLabels}"/>
-            <PasswordBox Style="{StaticResource PasswordBoxStyle}" Name="txtPassword"/>
-        </StackPanel>
+                <TextBlock Text="Password" Style="{StaticResource InputTextboxLabels}"/>
+                <PasswordBox Style="{StaticResource PasswordBoxStyle}" Name="txtPassword"/>
+            </StackPanel>
 
-        <!-- Save Button to initiate conversion -->
-        <Button Grid.Row="3" Content="Save" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=SaveCommand}"
+            <!-- AWS S3 bucket Information -->
+            <StackPanel Grid.Row="3" HorizontalAlignment="Left">
+                <TextBlock Text="Amazon S3 Bucket Details" Style="{StaticResource SectionHeader}" />
+
+                <StackPanel>
+                    <TextBlock Text="Bucket Name" Style="{StaticResource InputTextboxLabels}"/>
+                    <TextBox Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=BucketName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock Text="Access Key" Style="{StaticResource InputTextboxLabels}"/>
+                    <TextBox Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=AccessKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock Text="Secret Key" Style="{StaticResource InputTextboxLabels}"/>
+                    <TextBox Style="{StaticResource UserInputTextboxStyle}"  Text="{Binding Path=SecretKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Save Button to initiate conversion -->
+            <Button Grid.Row="4" Content="Save" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Path=SaveCommand}"
                 CommandParameter="{Binding ElementName=txtPassword}"/>
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </Page>

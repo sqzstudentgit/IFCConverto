@@ -30,6 +30,9 @@ namespace IFCConverto.ViewModels
         private string serverURL;
         private string username;
         private SettingsService settingsService;
+        private string bucketName;
+        private string accessKey;
+        private string secretKey;
 
         private ICommand saveCommand;
         private ICommand loadCommand;
@@ -60,6 +63,45 @@ namespace IFCConverto.ViewModels
             {
                 username = value;
                 OnPropertyChanged("Username");
+            }
+        }
+
+        public string BucketName
+        {
+            get
+            {
+                return bucketName;
+            }
+            set
+            {
+                bucketName = value;
+                OnPropertyChanged("BucketName");
+            }
+        }
+
+        public string SecretKey
+        {
+            get
+            {
+                return secretKey;
+            }
+            set
+            {
+                secretKey = value;
+                OnPropertyChanged("SecretKey");
+            }
+        }
+
+        public string AccessKey
+        {
+            get
+            {
+                return accessKey;
+            }
+            set
+            {
+                accessKey = value;
+                OnPropertyChanged("AccessKey");
             }
         }
 
@@ -125,10 +167,10 @@ namespace IFCConverto.ViewModels
         /// </summary>
         private async void Save(object param)
         {
-            var validationResult = Validate(param);
+            var validationResult = await Validate(param);
 
             // Validation failed, so we need to return
-            if (!validationResult.Result)
+            if (!validationResult)
             {
                 return;
             }
@@ -141,7 +183,10 @@ namespace IFCConverto.ViewModels
             {
                 ServerURL = ServerURL,
                 Username = Username,
-                Password = passwordBox.Password
+                Password = passwordBox.Password,
+                BucketName = BucketName,
+                SecretKey = SecretKey,
+                AccessKey = AccessKey
             };
 
             // Save the settings
@@ -162,6 +207,9 @@ namespace IFCConverto.ViewModels
             var appSettings = settingsService.LoadSettings();
             ServerURL = appSettings.ServerURL;
             Username = appSettings.Username;
+            SecretKey = appSettings.SecretKey;
+            BucketName = appSettings.BucketName;
+            AccessKey = appSettings.AccessKey;
             PasswordLoaded?.Invoke(appSettings.Password);
         }
 
