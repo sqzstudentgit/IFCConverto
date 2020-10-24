@@ -13,59 +13,43 @@ namespace IFCConverto.Services
         /// This method is used to send a POST request to the API with the JSON string
         /// </summary>
         /// <param name="meta">List of meta data for different products</param>
-        /// <returns>True or false based on the operation status</returns>
-        public static async Task<bool> Post(ProductData productData, string serverURL)
+        /// <returns>Custom HttpRequestResponse</returns>
+        public static async Task<HttpRequestResponse> Post(ProductData productData, string serverURL)
         {            
-            string requestStatus = string.Empty;
-
             using (HttpClient client = new HttpClient())
             {
-                // update this URL
-                //var url = "https://httpbin.org/post";
-                var url = serverURL;
+                string metadataImportPath = "metadata/import";
+                var url = new Uri(string.Format("{0}/{1}", serverURL, metadataImportPath));
 
                 try
                 {
                     var content = new StringContent(JsonConvert.SerializeObject(productData), Encoding.UTF8, "application/json");
                     var response = await client.PostAsync(url, content);
+                    string resultString = await response.Content.ReadAsStringAsync();
                     response.EnsureSuccessStatusCode();
-
-                    if(response.IsSuccessStatusCode && response.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        return true;
-                    }
-
-                    return false;
+                    return JsonConvert.DeserializeObject<HttpRequestResponse>(resultString);                    
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    throw ex;                    
                 }
             }                        
         }
 
-        public static async Task<bool> PostModelLinks(ProductData productData, string serverURL)
-        {
-            string requestStatus = string.Empty;
-
+        public static async Task<HttpRequestResponse> PostModelLinks(ProductData productData, string serverURL)
+        {            
             using (HttpClient client = new HttpClient())
             {
-                // update this URL
-                //var url = "https://httpbin.org/post";
-                var url = serverURL;
+                string imageImportPath = "threedmodel/import";                
+                var url = new Uri(string.Format("{0}/{1}", serverURL, imageImportPath));
 
                 try
                 {
                     var content = new StringContent(JsonConvert.SerializeObject(productData), Encoding.UTF8, "application/json");
                     var response = await client.PostAsync(url, content);
+                    string resultString = await response.Content.ReadAsStringAsync();
                     response.EnsureSuccessStatusCode();
-
-                    if (response.IsSuccessStatusCode && response.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        return true;
-                    }
-
-                    return false;
+                    return JsonConvert.DeserializeObject<HttpRequestResponse>(resultString);                    
                 }
                 catch (Exception ex)
                 {

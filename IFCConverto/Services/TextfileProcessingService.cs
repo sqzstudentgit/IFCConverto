@@ -1,4 +1,5 @@
-﻿using IFCConverto.Models;
+﻿using Amazon.S3.Model.Internal.MarshallTransformations;
+using IFCConverto.Models;
 using Microsoft.VisualBasic;
 using Microsoft.WindowsAPICodePack.Net;
 using Newtonsoft.Json;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 using static IFCConverto.Enums.DestinationLocationTypeEnum;
 using static IFCConverto.Enums.TextfileProcessingEnum;
 
@@ -61,43 +63,54 @@ namespace IFCConverto.Services
                         // Get the path for the source file
                         var sourceFile = Path.Combine(sourceLocation, file);                        
 
-                        // Read the first 2 lines of the text file.
-                        // We are only read the 2 lines for now due to current requirements, but for future just increase the number in Take(2) to how many lines you want to read
-                        var lines = File.ReadLines(sourceFile).Take(2).ToArray();
+                        // Read all the lines of the file                        
+                        var lines = File.ReadAllLines(sourceFile).ToArray();
 
                         // Final Heading Tokens after being cleaned and formatted would be stored in this list
                         var finalHeadings = ProcessHeaderString(lines[0]);
 
-                        // Will contain the values from the CSV file 
-                        var content = ProcessData(lines[1]);                                                
-
-                        // Time to process the strings and convert to Json
-                        // However, if this condition is not satisfied, that means there is something wrong with the file. We need to alert the user.
-                        if (content != null && finalHeadings != null && content.Count() > 0 && finalHeadings.Count > 0 && finalHeadings.Count == content.Count)
+                        // Loop over rest of the lines apart from the heading line
+                        foreach (var line in lines.Skip(1))
                         {
-                            var products = new Products
-                            {
-                                ProductParameters = new List<ProductParameters>(),
-                                Code = Path.GetFileNameWithoutExtension(file)
-                            };
+                            // Will contain the values from the CSV file 
+                            var content = ProcessData(line);
 
-                            // Now make the key value pairs of the tokenized strings
-                            for (var i = 0; i < finalHeadings.Count; i++)
-                            {
-                                var productParam = new ProductParameters
+                            // Time to process the strings and convert to Json
+                            // However, if this condition is not satisfied, that means there is something wrong with the file. We need to alert the user.
+                            if (content != null && finalHeadings != null && content.Count() > 0 && finalHeadings.Count > 0 && finalHeadings.Count == content.Count)
+                            {                                
+                                var product = new Products
                                 {
-                                    Key = finalHeadings[i],
-                                    Value = content[i]
+                                    ProductParameters = new List<ProductParameters>(),                                    
                                 };
 
-                                products.ProductParameters.Add(productParam);
-                            }
+                                // Now make the key value pairs of the tokenized strings
+                                for (var i = 0; i < finalHeadings.Count; i++)
+                                {
+                                    // add a check to fill out the product code if the token is "Product Code". Then we need to update the product code
+                                    // otherwise, fill out key value pairs
+                                    if (finalHeadings[i].ToLowerInvariant().Equals("product code"))
+                                    {
+                                        product.Code = content[i];
+                                    }
+                                    else
+                                    {
+                                        var productParam = new ProductParameters
+                                        {
+                                            Key = finalHeadings[i],
+                                            Value = content[i]
+                                        };
 
-                            productList.Add(products);                            
-                        }                        
-                        else
-                        {
-                            ColumnMismatch?.Invoke("A mismatch between heading and content columns occured in file: " + Path.GetFileNameWithoutExtension(file));
+                                        product.ProductParameters.Add(productParam);
+                                    }                                    
+                                }
+
+                                productList.Add(product);
+                            }
+                            else
+                            {
+                                ColumnMismatch?.Invoke("A mismatch between heading and content columns occured in file: " + Path.GetFileNameWithoutExtension(file));
+                            }
                         }
                         
                         totalFiles--;
@@ -109,28 +122,19 @@ namespace IFCConverto.Services
                     // check user's preference and save or send the file accordingly.
                     if (destinationType == DestinationLocationType.Local)
                     {
-                        StoreDataLocally(productList, destinationLocation);
+                        var result = StoreDataLocally(productList, destinationLocation);
+                        return result ? TextfileProcessingStatus.Done : TextfileProcessingStatus.Error;
                     }
                     else if (destinationType == DestinationLocationType.Server)
                     {                        
                         var result = await SendDataToAPI(productList);
-
-                        if(!result)
-                        {
-                            ProcessingException?.Invoke("Could not send data to Server");
-                            return TextfileProcessingStatus.Error;
-                        }
+                        return result ? TextfileProcessingStatus.Done : TextfileProcessingStatus.Error;
                     }
                     else if(destinationType == DestinationLocationType.Both)
                     {
-                        StoreDataLocally(productList, destinationLocation);
-                        var result = await SendDataToAPI(productList);
-
-                        if (!result)
-                        {
-                            ProcessingException?.Invoke("Could not send data to Server");
-                            return TextfileProcessingStatus.Error;
-                        }
+                        var localStorageResult = StoreDataLocally(productList, destinationLocation);
+                        var serverStorageResult = await SendDataToAPI(productList);
+                        return (localStorageResult && serverStorageResult) ? TextfileProcessingStatus.Done : TextfileProcessingStatus.PartialSuccess;
                     }
                                         
                     // Return success message
@@ -139,7 +143,7 @@ namespace IFCConverto.Services
             }
             catch (Exception ex)
             {
-                ProcessingException?.Invoke(ex.Message);
+                ProcessingException?.Invoke("There was an error while processing the textfiles. Exception: " + ex.Message);
                 return TextfileProcessingStatus.Error;
             }
         }
@@ -149,16 +153,26 @@ namespace IFCConverto.Services
         /// </summary>
         /// <param name="productList">List of products</param>
         /// <param name="destinationLocation">Destination location path</param>
-        private void StoreDataLocally(List<Products> productList, string destinationLocation)
+        private bool StoreDataLocally(List<Products> productList, string destinationLocation)
         {
-            // Combine all the processed textfile in 1 Json file and place in the destiantion folder
-            var destinationFile = Path.Combine(destinationLocation, "ParameterizedData.json");
-
-            using (StreamWriter file = File.CreateText(destinationFile))
+            try
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, productList);
-            }            
+                // Combine all the processed textfile in 1 Json file and place in the destiantion folder
+                var destinationFile = Path.Combine(destinationLocation, "ParameterizedData.json");
+
+                using (StreamWriter file = File.CreateText(destinationFile))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(file, productList);
+                }
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+                ProcessingException?.Invoke("There was an error while storing the data at local destination. Exception: " + ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -167,18 +181,35 @@ namespace IFCConverto.Services
         /// <param name="productList">List of products</param>
         private async Task<bool> SendDataToAPI(List<Products> productList)
         {
-            var serverDetails = new SettingsService().LoadSettings();
-
-            var productData = new ProductData
+            try
             {
-                Username = serverDetails.Username,
-                Password = serverDetails.Password,
-                Products = productList
-            };
+                var serverDetails = new SettingsService().LoadSettings();
 
-            var data = JsonConvert.SerializeObject(productData);
+                var productData = new ProductData
+                {
+                    Username = serverDetails.Username,
+                    Password = serverDetails.Password,
+                    Products = productList
+                };
 
-            return await HttpService.Post(productData, serverDetails.ServerURL);
+                var result = await HttpService.Post(productData, serverDetails.ServerURL);
+
+                if (result.Status.ToLowerInvariant().Equals("success"))
+                {
+                    //ProcessingException?.Invoke(result.Message);
+                    return true;
+                }
+                else
+                {
+                    ProcessingException?.Invoke("Could not save data to Server due to following reason. Reason:" + result.Message);
+                    return false;
+                }
+            }
+            catch(Exception ex)
+            {
+                ProcessingException?.Invoke("There was an error while sending data to the server. Exception:" + ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
