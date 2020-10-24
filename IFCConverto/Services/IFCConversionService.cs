@@ -150,7 +150,6 @@ namespace IFCConverto.Services
 
                 // Initialization                        
                 var uploader = new S3UploadService(awsDetails.BucketName, awsDetails.AccessKey, awsDetails.SecretKey);
-                var tasks = new List<Task>();
                 var sourceFiles = new List<string>();
                 var productUrls = new List<Products>();
 
@@ -171,27 +170,22 @@ namespace IFCConverto.Services
                 var uploaded = 0;
 
                 // Create separate threads to upload files on the AWS.
-                foreach (var currentFile in sourceFiles)
+                Parallel.ForEach(sourceFiles, currentFile =>
                 {
-                    Task uploadThread = Task.Run(() =>
+                    
+                    string filename = Path.GetFileName(currentFile);
+                    var product = new Products
                     {
-                        string filename = Path.GetFileName(currentFile);
-                        var product = new Products
-                        {
-                            Code = Path.GetFileNameWithoutExtension(currentFile),
-                            ModelURL = uploader.UploadFile(currentFile, filename),
-                            ProductParameters = null
-                        };
+                        Code = Path.GetFileNameWithoutExtension(currentFile),
+                        ModelURL = uploader.UploadFile(currentFile, filename),
+                        ProductParameters = null
+                    };
 
-                        productUrls.Add(product);
-                        uploaded++;
-                        RemainingModels?.Invoke((totalModels - uploaded).ToString());
-                    });
-
-                    tasks.Add(uploadThread);
-                }
-
-                Task.WaitAll(tasks.ToArray());
+                    productUrls.Add(product);
+                    uploaded++;
+                    RemainingModels?.Invoke((totalModels - uploaded).ToString());
+                    
+                });
 
                 // Return list of all the urls for the uploaded objects
                 return productUrls;

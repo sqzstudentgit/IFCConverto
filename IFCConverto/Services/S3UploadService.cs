@@ -31,7 +31,7 @@ namespace IFCConverto.Services
             IAmazonS3 client = new AmazonS3Client(awsAccessKey, awsSecretKey, RegionEndpoint.APSoutheast2);
 
             FileInfo file = new FileInfo(filePath);
-            string path = awsSubFolder+"/" + filename;            
+            string path = awsSubFolder+"/" + filename;
 
             PutObjectRequest request = new PutObjectRequest()
             {
