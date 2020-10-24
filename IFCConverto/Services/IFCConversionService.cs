@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using static IFCConverto.Enums.DestinationLocationTypeEnum;
 using static IFCConverto.Enums.IFCConvertEnum;
@@ -118,7 +119,6 @@ namespace IFCConverto.Services
 
                 if (result.Status.ToLowerInvariant().Equals("success"))
                 {
-                    //ProcessingException?.Invoke(result.Message);
                     return true;
                 }
                 else
@@ -168,23 +168,33 @@ namespace IFCConverto.Services
                 // Model Count for Progress bar
                 var totalModels = files.Count();
                 var uploaded = 0;
-
+              
                 // Create separate threads to upload files on the AWS.
                 Parallel.ForEach(sourceFiles, currentFile =>
                 {
-                    
+                    // Call a method to see if the file is created at the location or not before accessing it.
+                    var fileFound = WaitForFile(currentFile);
                     string filename = Path.GetFileName(currentFile);
-                    var product = new Products
-                    {
-                        Code = Path.GetFileNameWithoutExtension(currentFile),
-                        ModelURL = uploader.UploadFile(currentFile, filename),
-                        ProductParameters = null
-                    };
 
-                    productUrls.Add(product);
-                    uploaded++;
-                    RemainingModels?.Invoke((totalModels - uploaded).ToString());
-                    
+                    // If file is found, then start uploading process
+                    // else send a message to the user with the issue related to filename.
+                    if (fileFound)
+                    {                        
+                        var product = new Products
+                        {
+                            Code = Path.GetFileNameWithoutExtension(currentFile),
+                            ModelURL = uploader.UploadFile(currentFile, filename),
+                            ProductParameters = null
+                        };
+
+                        productUrls.Add(product);
+                        uploaded++;
+                        RemainingModels?.Invoke((totalModels - uploaded).ToString());
+                    }
+                    else
+                    {
+                        ProcessingException?.Invoke("The file: " + filename + " could not be found in the destination folder for uploading");
+                    }
                 });
 
                 // Return list of all the urls for the uploaded objects
@@ -195,6 +205,33 @@ namespace IFCConverto.Services
                 ProcessingException?.Invoke("There was an exeception while uploading the files to S3 bucket. Exception: " + ex.Message);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// This method was introduced as the utility was trying to upload the files that were still being created which caused a crash. This method makes sure that the 
+        /// files needed to be accesed have been created. If not, then it would just return false
+        /// </summary>
+        /// <param name="filename">Name of the intended file with full path</param>
+        /// <returns>True or false, depending on whether the file was found or not</returns>
+        private bool WaitForFile(string filename)
+        {
+            // We are only going to check 10 times, if the file is present or not. This will give the system 10 seconds to find the converted file            
+            for(var i = 0; i < 10; i++)
+            {
+                // If file is found, then just return true.
+                // else make the thread wait by putting it to sleep for 1 second. 
+                if(File.Exists(filename))
+                {
+                    return true;
+                }
+                else
+                {
+                    Thread.Sleep(1000);
+                }                    
+            }
+
+            // After 5 tries, file not found. Return false
+            return false;
         }
     }
 }
