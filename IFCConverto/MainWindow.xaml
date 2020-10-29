@@ -1,14 +1,14 @@
-﻿<controls:MetroWindow  xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls" 
-                       x:Class="IFCConverto.MainWindow"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      
-                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                       xmlns:viewModels="clr-namespace:IFCConverto.ViewModels"
-                       mc:Ignorable="d"
-                      Title="IFC Converto" Height="700" Width="1200" Loaded="OnLoaded">
+﻿<controls:MetroWindow
+    x:Class="IFCConverto.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:IFCConverto.ViewModels"
+    mc:Ignorable="d"
+    Title="SQUIZZ - IFC Converto" Height="700" Width="1200" Loaded="OnLoaded">
 
     <!-- Data context for the Metro Window -->
     <controls:MetroWindow.DataContext>
