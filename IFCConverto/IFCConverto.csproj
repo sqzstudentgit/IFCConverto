@@ -50,7 +50,7 @@
     </Reference>
     <Reference Include="IFCConvertoLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\IFCConvertoLibrary.dll</HintPath>
+      <HintPath>.\IFCConvertoLibrary.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.2.2.0\lib\net46\MahApps.Metro.dll</HintPath>
@@ -278,6 +278,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="SquizzIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="IFCConvertoLibrary.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
