@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IFCConverto", "IFCConverto\IFCConverto.csproj", "{5C878222-1DC0-41A8-BB85-79DA99CB9B05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IFCConvertoTests1", "IFCConvertoTests1\IFCConvertoTests1.csproj", "{344D8B46-328C-43C7-82F6-4516B6F4BB38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{5C878222-1DC0-41A8-BB85-79DA99CB9B05}.Release|x64.Build.0 = Release|Any CPU
 		{5C878222-1DC0-41A8-BB85-79DA99CB9B05}.Release|x86.ActiveCfg = Release|Any CPU
 		{5C878222-1DC0-41A8-BB85-79DA99CB9B05}.Release|x86.Build.0 = Release|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Debug|x64.Build.0 = Debug|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Debug|x86.Build.0 = Debug|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Release|x64.ActiveCfg = Release|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Release|x64.Build.0 = Release|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Release|x86.ActiveCfg = Release|Any CPU
+		{344D8B46-328C-43C7-82F6-4516B6F4BB38}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
