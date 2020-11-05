@@ -33,6 +33,13 @@ namespace IFCConverto.Services
             {
                 return await Task.Run(async () =>
                 {
+                    // Check if destination folder exist
+                    if(!Directory.Exists(destinationLocation))
+                    {
+                        ProcessingException?.Invoke("The destination folder does not exist. Please specify the correct folder");
+                        return IFCConvertStatus.Error;
+                    }
+
                     // get all file names from the source location
                     var allFilenames = Directory.EnumerateFiles(sourceLocation).Select(p => Path.GetFileName(p));
 
