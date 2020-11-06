@@ -2,15 +2,15 @@
  Utility that can be used to convert IFC files to 3D models and Process Textfiles for parameterized data
  
 ## Table of Contents
-1. [Project Description](##Project-Description)
-2. [Utility Mode](##Utility-Mode)
-3. [Features](##Features)
-4. [System Requirements](##System-Requirements)
-5. [Technologies Used](##Technologies-Used)
-6. [Setup Guide](##Setup-Guide)
-7. [Testing](##Testing)
-8. [Release History](##Release-History)
-9. [Attribution](##Attribution)
+1. [Project Description](#Project-Description)
+2. [Utility Mode](#Utility-Mode)
+3. [Features](#Features)
+4. [System Requirements](#System-Requirements)
+5. [Technologies Used](#Technologies-Used)
+6. [Setup Guide](#Setup-Guide)
+7. [Testing](#Testing)
+8. [Release History](#Release-History)
+9. [Attribution](#Attribution)
 
 ## Project Description
 This repository contains source code for the desktop utility. The utility can perform conversion of the IFC files to 3D models and conversion of the textfiles to Json format. 
